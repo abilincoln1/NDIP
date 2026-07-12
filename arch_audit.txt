@@ -1,0 +1,452 @@
+=== LEADERSHIP PACK SOURCE ===
+@router.get("/")
+def leadership_pack(
+    days: int = Query(7, ge=1, le=30),
+    db: Session = Depends(get_db),
+    _: dict = Depends(get_current_user),
+):
+    ck = cache_key("leadership-pack", f"days={days}")
+    cached = get_cached(ck)
+    if cached:
+        cached["_cached"] = True
+        return cached
+    from app.services.interpretation_engine import (
+        generate_differentiated_assessment,
+        generate_comparative_intelligence,
+        generate_narrative_competition_analysis,
+        generate_outlook_engine,
+    )
+    narratives = get_narrative_analysis(db, days)
+    metrics = compute_all_metrics(db, max(days, 30))
+    situation = generate_situation_room(db, days)
+    source_quality = get_source_quality_report(db, days)
+    data_quality = get_data_quality_report(db)
+    risks = detect_all_risks(db, days)
+    opportunities = detect_all_opportunities(db, days)
+    # Full narrative assessments
+    assessments = [generate_differentiated_assessment(n) for n in narratives[:10]]
+    comparisons = generate_comparative_intelligence(narratives)
+    competition = generate_narrative_competition_analysis(narratives)
+    outlook = generate_outlook_engine(narratives, days, risks, opportunities)
+    # Diaspora / National / Election split
+    diaspora_assessment = next((a for a in assessments if a["narrative"] == "Global Nigerian Engagement"), None)
+    national_assessments = [a for a in assessments if a["narrative"] in (
+        "Governance", "Economy", "Security", "Elections & Democracy",
+        "Energy", "Infrastructure", "Education", "Health", "Investment"
+    )]
+    election_assessment = next((a for a in assessments if a["narrative"] == "Elections & Democracy"), None)
+    # Confidence statement
+    limitations = []
+    if source_quality["source_count"] < 8:
+        limitations.append(f"Intelligence draws from {source_quality['source_count']} active sources — expanding source coverage would improve narrative breadth.")
+    if data_quality["nlp_rate"] < 95:
+        limitations.append(f"NLP processing rate is {data_quality['nlp_rate']}% — a small proportion of ingested records may not be fully analysed.")
+    if days < 7:
+        limitations.append(f"This briefing covers only {days} days — a longer window would provide more reliable trend data.")
+    if not limitations:
+        limitations.append("No significant data quality limitations identified for this reporting period.")
+    # National context
+    nat_context = situation.get("national_context", "") or ""
+    result = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "period_days": days,
+        "version": "5.1",
+        # PAGE 1 — Executive Summary
+        "executive_summary": situation["executive_summary"],
+        "what_matters_most": situation.get("what_matters_most", ""),
+        "significant_changes": situation.get("significant_changes", []),
+        "national_context": nat_context,
+        "comparative_intelligence": comparisons,
+        "competition_analysis": competition,
+        "key_findings": situation.get("key_findings", []),
+        # PAGE 2 — Strategic Narrative Assessment
+        "narrative_assessments": assessments,
+        "diaspora_assessment": diaspora_assessment,
+        "national_assessments": national_assessments,
+        "election_assessment": election_assessment,
+        "narrative_share_of_voice": situation.get("narrative_share_of_voice", []),
+        # PAGE 3 — Strategic Risks
+        "risks": sorted(risks, key=lambda x: x.get("level_order", 3)),
+        # PAGE 4 — Strategic Opportunities
+        "opportunities": opportunities,
+        # PAGE 5 — Outlook + Confidence
+        "outlook": outlook,
+        "confidence_statement": {
+            "overall_rating": source_quality["overall_confidence_label"],
+            "overall_score": round(source_quality["overall_confidence"] * 100),
+            "data_quality": data_quality["overall_quality"],
+            "source_coverage": f"{source_quality['source_count']} active sources",
+            "source_diversity": "High" if source_quality["source_count"] >= 8 else "Moderate" if source_quality["source_count"] >= 4 else "Limited",
+            "evidence_volume": f"{source_quality['total_records']:,} records analysed",
+            "nlp_success_rate": f"{source_quality['processing_rate']}%",
+            "data_freshness": "Last 24 hours" if days <= 1 else f"Last {days} days",
+            "limitations": limitations,
+            "summary": source_quality["summary"],
+        },
+        "metrics": {
+            "engagement_index": metrics["engagement_index"],
+            "sentiment_score": metrics["sentiment_score"],
+            "total_participants": metrics["total_participants"],
+            "total_records": source_quality["total_records"],
+            "source_count": source_quality["source_count"],
+        },
+    }
+    # Add V5.3 modules
+    try:
+        from app.services.watchlist import generate_watchlist
+        result["watchlist"] = generate_watchlist(db, days)
+    except Exception:
+        result["watchlist"] = {"items": [], "summary": "Watchlist unavailable"}
+    try:
+        from app.services.gnei import generate_gnei_intelligence
+        result["gnei"] = generate_gnei_intelligence(db, days)
+    except Exception:
+        result["gnei"] = None
+    try:
+        from app.services.strategic_importance import score_all_narratives, generate_trigger_attribution
+        result["strategic_importance"] = score_all_narratives(narratives)
+        result["trigger_attributions"] = generate_trigger_attribution(narratives, db, days)
+    except Exception:
+        result["strategic_importance"] = []
+        result["trigger_attributions"] = []
+    # V5.6 — Decision Support Performance (Executive Learning Loop)
+    try:
+        from app.services.recommendation_tracker import get_decision_support_performance_summary
+        result["decision_support_performance"] = get_decision_support_performance_summary(db)
+    except Exception:
+        result["decision_support_performance"] = None
+    # V5.8 Phase H — Intelligence Performance (platform-wide learning summary)
+    try:
+        from app.services.intelligence_learning import run_intelligence_learning_cycle
+        result["intelligence_performance"] = run_intelligence_learning_cycle(db)
+    except Exception:
+        result["intelligence_performance"] = None
+
+    # V6.0 Phase G — Leadership Pack enhancements: Strategic Opportunities,
+    # Key Stakeholders, Engagement Priorities, Opportunity Pipeline. Best
+    # effort: Leadership Pack must continue working even if V6.0 data is
+    # unavailable or the registries are empty.
+    try:
+        from app.services.opportunity_intelligence import get_top_opportunities, get_opportunity_pipeline_summary
+        from app.services.stakeholder_registry import get_top_stakeholders
+
+        result["strategic_opportunities"] = get_top_opportunities(db, limit=5)
+        result["key_stakeholders"] = get_top_stakeholders(db, limit=8, days=min(days, 30))
+        result["engagement_priorities"] = [
+            s for s in result["key_stakeholders"] if s.get("monitoring_priority") in ("High", "Critical")
+        ][:5]
+        result["opportunity_pipeline"] = get_opportunity_pipeline_summary(db)
+    except Exception:
+        result["strategic_opportunities"] = []
+        result["key_stakeholders"] = []
+        result["engagement_priorities"] = []
+        result["opportunity_pipeline"] = {}
+
+    # V6.1 Phase H — Stakeholder Influence Summary and Emerging Stakeholders.
+    # Separate try/except from the V6.0 block above: V6.1's influence engine
+    # is a different module, so a failure here should not affect the V6.0
+    # fields that already work.
+    try:
+        from app.services.stakeholder_influence import get_top_influence_stakeholders, get_emerging_stakeholders
+        _influence_ranked = get_top_influence_stakeholders(db, limit=50, days=min(days, 30))
+        result["stakeholder_influence_summary"] = _influence_ranked[:8]
+        result["emerging_stakeholders"] = get_emerging_stakeholders(db, limit=5, days=min(days, 30), _precomputed_ranked=_influence_ranked)
+    except Exception:
+        result["stakeholder_influence_summary"] = []
+        result["emerging_stakeholders"] = []
+    # V6.1.1 Phase H — Priority Stakeholders / Decision Makers / Authority Map.
+    # Best-effort: derives from the same OpportunityAssessment rows already
+    # fetched above via get_top_opportunities, classifying each opportunity's
+    # required_stakeholders by their real stakeholder_type into the dossier's
+    # Decision Makers / Funding Sources / Implementation buckets. Does not
+    # recompute alignment or readiness -- reuses generate_opportunity_dossier,
+    # which itself reuses the existing V6.0A execution-plan engine.
+    try:
+        from app.services.opportunity_dossier import generate_opportunity_dossier
+        priority_decision_makers = []
+        seen_names = set()
+        for opp in result.get("strategic_opportunities", [])[:5]:
+            opp_id = opp.get("id") or opp.get("opportunity_id")
+            if opp_id is None:
+                continue
+            try:
+                dossier = generate_opportunity_dossier(db, opp_id)
+            except Exception:
+                continue
+            for s in dossier["stakeholders_by_role"].get("Decision Makers", []):
+                if s["name"] not in seen_names:
+                    priority_decision_makers.append({
+                        "name": s["name"],
+                        "stakeholder_type": s["stakeholder_type"],
+                        "alignment_score": s["alignment_score"],
+                        "related_opportunity": dossier["opportunity_assessment"],
+                    })
+                    seen_names.add(s["name"])
+        result["priority_decision_makers"] = priority_decision_makers[:8]
+    except Exception:
+        result["priority_decision_makers"] = []
+
+    # V5.8 Phase F — Narrative Intelligence module self-evaluation.
+    # Track growth predictions for the top 3 narratives by share of voice,
+    # once per Leadership Pack generation (not per get_narrative_analysis call,
+    # which would create excessive duplicate tracking given how many modules
+    # call that shared utility function).
+    try:
+        from app.services.recommendation_tracker import record_recommendation
+        for n in narratives[:3]:
+            direction = n.get("momentum_direction", "stable")
+            category = "MONITOR" if direction in ("rising", "stable") else "MONITOR"
+            record_recommendation(
+                db,
+                narrative=n["narrative"],
+                recommendation_text=(
+                    f"{n['narrative']} discourse is {direction} (momentum {n['momentum']:+.0f}%) "
+                    f"at {n['share_of_voice']}% share of voice — expected to continue this trajectory "
+                    f"over the next reporting period."
+                ),
+                category=category,
+                priority="Medium",
+                confidence=n.get("confidence_label", "Medium"),
+                time_horizon="14 days",
+                supporting_evidence=f"{n['count']} mentions across {n['source_count']} sources",
+                expected_outcome=f"Share of voice and momentum direction consistent with current {direction} trend",
+                trigger_metric_name="share_of_voice",
+                trigger_metric_value=float(n["share_of_voice"]),
+                period_days=days,
+                module="narrative_intelligence",
+            )
+    except Exception:
+        try:
+            db.rollback()
+        except Exception:
+            pass
+    # V5.8 Phase F — Leadership Pack module self-evaluation.
+    # Track the Pack's own 7-day outlook as an evaluable recommendation,
+    # distinct from per-narrative tracking (tagged narrative_intelligence above).
+    try:
+        from app.services.recommendation_tracker import record_recommendation
+        top_narrative = narratives[0] if narratives else None
+        record_recommendation(
+            db,
+            narrative=top_narrative["narrative"] if top_narrative else None,
+            recommendation_text=outlook.get("7_day", "") if isinstance(outlook, dict) else str(outlook),
+            category="MONITOR",
+            priority="Medium",
+            confidence="Medium",
+            time_horizon="7 days",
+            supporting_evidence=f"Leadership Pack strategic outlook, {len(narratives)} narratives assessed",
+            expected_outcome="Discourse trajectory consistent with 7-day outlook assessment",
+            trigger_metric_name="share_of_voice",
+            trigger_metric_value=float(top_narrative["share_of_voice"]) if top_narrative else None,
+            period_days=days,
+            module="leadership_pack",
+        )
+    except Exception:
+        try:
+            db.rollback()
+        except Exception:
+            pass
+    set_cached(ck, result, TTL_LEADERSHIP_PACK)
+    return result
+
+
+=== GENERATE SITUATION ROOM SOURCE ===
+def generate_situation_room(db: Session, days: int = 7) -> dict:
+    now = datetime.now(timezone.utc)
+    metrics = compute_all_metrics(db, max(days, 30))  # use min 30 days for stable metrics
+    sentiment_trends = get_sentiment_trends(db, days)
+    narrative_results = get_narrative_analysis(db, days)
+    entities = get_top_entities(db, days, limit=10)
+    emerging = get_emerging_topics(db, days)
+    underrepresented = get_underrepresented_narratives(narrative_results, days)
+
+    recent = [t["avg_score"] for t in sentiment_trends[-3:]] if sentiment_trends else []
+    older = [t["avg_score"] for t in sentiment_trends[:3]] if len(sentiment_trends) > 3 else []
+    sentiment_shift = round((sum(recent)/len(recent) - sum(older)/len(older)) if recent and older else 0.0, 4)
+
+    key_findings = generate_key_findings(metrics, sentiment_shift, narrative_results, entities, emerging)
+    risks = identify_risks(metrics, sentiment_shift, narrative_results, underrepresented)
+    opportunities = generate_opportunity_insights(narrative_results)
+    changes = _detect_changes(metrics, sentiment_shift, narrative_results)
+    outlook = _generate_outlook(metrics, sentiment_shift, risks, opportunities)
+
+    narrative_sov = [{
+        "narrative": n["narrative"], "share_of_voice": n["share_of_voice"],
+        "momentum": n["momentum"], "momentum_direction": n["momentum_direction"],
+        "sentiment_label": n["sentiment_label"], "confidence_label": n["confidence_label"],
+        "source_count": n["source_count"], "count": n["count"],
+        "strategic_insight": generate_strategic_insight(n, i),
+    } for i, n in enumerate(narrative_results[:8])]
+
+    emerging_enriched = [{
+        "topic": t["topic"].title(), "category": t.get("category", "Other"),
+        "velocity": t["velocity"],
+        "plain_english": (f"Discussion of {t['topic'].title()} surged significantly — a rapidly emerging subject." if t["velocity"] >= 2
+                          else f"{t['topic'].title()} is gaining momentum in public conversation."),
+        "confidence_label": "High" if t["velocity"] >= 2 else "Medium",
+    } for t in emerging[:5]]
+
+    total_sources = len(set(s for n in narrative_results for s in n.get("sources", [])))
+    exec_summary = (
+        f"Over the past {days} days, the National & Diaspora Intelligence Platform (NDIP) monitored discourse across "
+        f"{total_sources} active source{'s' if total_sources != 1 else ''}. "
+        f"{interpret_engagement(metrics['engagement_index'])} "
+        f"{interpret_sentiment(metrics['sentiment_score'])} "
+        f"{interpret_sentiment_shift(sentiment_shift)} "
+        f"{'There are ' + str(len([r for r in risks if r['level'] in ('HIGH','MEDIUM')])) + ' issue(s) requiring leadership attention.' if [r for r in risks if r['level'] in ('HIGH','MEDIUM')] else 'No critical issues detected this period.'}"
+    )
+
+    result = {
+        "generated_at": now.isoformat(), "period_days": days,
+        "executive_summary": exec_summary,
+        "key_findings": key_findings,
+        "narrative_share_of_voice": narrative_sov,
+        "underrepresented_narratives": underrepresented,
+        "risks": risks, "opportunities": opportunities,
+        "significant_changes": changes,
+        "emerging_topics": emerging_enriched,
+        "outlook": outlook,
+        "what_matters_most": key_findings[0]["finding"] if key_findings else "Insufficient data.",
+        "recommended_monitoring": [r["title"] for r in risks if r["level"] in ("HIGH","MEDIUM")][:3] or ["Continue routine monitoring."],
+        "metrics_summary": {
+            "participants": metrics["total_participants"],
+            "engagement_plain": interpret_engagement(metrics["engagement_index"]),
+            "sentiment_plain": interpret_sentiment(metrics["sentiment_score"]),
+            "growth_plain": interpret_growth(metrics["growth_rate"]),
+            "sentiment_score": metrics["sentiment_score"],
+            "engagement_index": metrics["engagement_index"],
+            "growth_rate": metrics["growth_rate"],
+        },
+    }
+
+    # V5.8 Phase F — track Situation Room's outlook and top risk as evaluable
+    # recommendations, contributing to its module self-evaluation.
+    try:
+        from app.services.recommendation_tracker import record_recommendation
+        record_recommendation(
+            db,
+            narrative=narrative_sov[0]["narrative"] if narrative_sov else None,
+            recommendation_text=outlook if isinstance(outlook, str) else str(outlook),
+            category="MONITOR",
+            priority="Medium",
+            confidence="Medium",
+            time_horizon="14 days",
+            supporting_evidence=f"Situation Room outlook, engagement_index={metrics['engagement_index']}",
+            expected_outcome="Narrative competition and engagement trends consistent with outlook",
+            trigger_metric_name="engagement_index",
+            trigger_metric_value=float(metrics["engagement_index"]),
+            period_days=days,
+            module="situation_room",
+        )
+        if risks:
+            top_risk = risks[0]
+            record_recommendation(
+                db,
+                narrative=narrative_sov[0]["narrative"] if narrative_sov else None,
+                recommendation_text=top_risk.get("title", "") + " — " + top_risk.get("description", ""),
+                category="ESCALATE" if top_risk.get("level") == "HIGH" else "MONITOR",
+                priority=top_risk.get("level", "Medium").title(),
+                confidence="Medium",
+                time_horizon="14 days",
+                supporting_evidence="Situation Room risk identification",
+                expected_outcome="Risk materialises or resolves consistent with assessed level",
+                trigger_metric_name="sentiment_score",
+                trigger_metric_value=float(metrics["sentiment_score"]),
+                period_days=days,
+                module="situation_room",
+            )
+    except Exception:
+        try:
+            db.rollback()
+        except Exception:
+            pass
+
+    return result
+
+
+=== SOI DASHBOARD SOURCE ===
+@router.get("/dashboard")
+def strategic_outcome_dashboard(
+    days: int = Query(30, ge=1, le=90),
+    db: Session = Depends(get_db),
+    _: dict = Depends(get_current_user),
+):
+    """
+    Phase N: the consolidated executive dashboard combining everything
+    V6.0 added — top opportunities, stakeholder rankings, the opportunity
+    pipeline, engagement priorities, the outcome tracker's strategic
+    metrics, and decision quality. Generates fresh opportunity assessments
+    from current discourse before returning, so the dashboard always
+    reflects up-to-date signal detection rather than only previously
+    promoted opportunities.
+    """
+    _cache_key = cache_key("soi-dashboard", f"days={days}")
+    _cached = get_cached(_cache_key)
+    if _cached is not None:
+        _cached["_cached"] = True
+        return _cached
+
+    from app.services.opportunity_intelligence import (
+        generate_opportunity_assessments, get_top_opportunities, get_opportunity_pipeline_summary,
+    )
+    from app.services.stakeholder_registry import get_top_stakeholders
+    from app.services.intelligence_learning import run_intelligence_learning_cycle
+
+    generation_result = generate_opportunity_assessments(db, days)
+
+    top_opportunities = get_top_opportunities(db, limit=10)
+    pipeline_summary_data = get_opportunity_pipeline_summary(db)
+    top_stakeholders = get_top_stakeholders(db, limit=10, days=days)
+    learning_cycle = run_intelligence_learning_cycle(db)
+
+    value_counts = {"Critical": 0, "High": 0, "Medium": 0, "Low": 0}
+    for o in top_opportunities:
+        sv = o.get("strategic_value", "Low")
+        value_counts[sv] = value_counts.get(sv, 0) + 1
+
+    engagement_priorities = [
+        s for s in top_stakeholders if s.get("monitoring_priority") in ("High", "Critical")
+    ][:5]
+
+    # V6.1.2 Phase B -- dossier-derived Decision Makers / Funding Sources /
+    # Implementation breakdown per opportunity, reusing
+    # generate_opportunity_dossier (no new computation engine; classifies
+    # the same already-computed alignment data by real stakeholder_type).
+    opportunity_dossiers = []
+    try:
+        from app.services.opportunity_dossier import generate_opportunity_dossier
+        for o in top_opportunities[:10]:
+            opp_id = o.get("id") or o.get("opportunity_id")
+            if opp_id is None:
+                continue
+            try:
+                dossier = generate_opportunity_dossier(db, opp_id)
+                opportunity_dossiers.append({
+                    "opportunity_id": opp_id,
+                    "title": dossier["opportunity_assessment"],
+                    "decision_makers": dossier["stakeholders_by_role"]["Decision Makers"],
+                    "funding_sources": dossier["stakeholders_by_role"]["Funding Sources"],
+                    "implementation": dossier["stakeholders_by_role"]["Implementation"],
+                    "data_quality_notes": dossier["data_quality_notes"],
+                })
+            except Exception:
+                continue
+    except Exception:
+        opportunity_dossiers = []
+
+    result = {
+        "period_days": days,
+        "generation_summary": generation_result,
+        "top_opportunities": top_opportunities,
+        "stakeholder_rankings": top_stakeholders,
+        "engagement_priorities": engagement_priorities,
+        "opportunity_pipeline": pipeline_summary_data,
+        "strategic_value_distribution": value_counts,
+        "decision_quality_metrics": learning_cycle.get("decision_quality_metrics"),
+        "strategic_outcome_metrics": learning_cycle.get("strategic_outcome_metrics"),
+        "platform_learning_score": learning_cycle.get("platform_learning_score"),
+        "opportunity_dossiers": opportunity_dossiers,
+    }
+    set_cached(_cache_key, result, TTL_SOI_DASHBOARD)
+    return result
+

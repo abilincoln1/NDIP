@@ -1,0 +1,8 @@
+10:def generate_national_pulse_executive(db: Session, days: int, pulse_score: int, pulse_label: str) -> dict:
+78:            f"visiting Nigeria, investing, and encouraging family return migration."
+133:        actions.append({
+142:        actions.append({
+151:        actions.append({
+160:        actions.append({
+169:        actions.append({
+185:    return {

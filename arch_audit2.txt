@@ -1,0 +1,201 @@
+=== GENERATE_WATCHLIST ===
+def generate_watchlist(db: Session, days: int = 7) -> dict:
+    """Generate unified Leadership Watchlist from all intelligence modules."""
+    from app.services.risk_opportunity import detect_all_risks, detect_all_opportunities
+    from app.services.election_intelligence import generate_full_election_intelligence, ELECTION_DATE
+    from app.analytics.engine import compute_all_metrics
+    from app.services.source_quality import get_source_quality_report
+
+    narratives = get_narrative_analysis(db, days)
+    risks = detect_all_risks(db, days)
+    opportunities = detect_all_opportunities(db, days)
+    metrics = compute_all_metrics(db, max(days, 30))
+    source_quality = get_source_quality_report(db, days)
+    now = datetime.now(timezone.utc)
+    days_to_election = (ELECTION_DATE - now).days
+
+    items = []
+
+    # ── CRITICAL RISKS ────────────────────────────────────────────────────────
+    for r in risks:
+        if r.get("level") == "Critical":
+            items.append(_make_item(
+                title=r["title"],
+                why=r["detail"],
+                priority="Critical",
+                reason=f"Critical risk detected — {r.get('rationale', 'Requires immediate attention')}",
+                monitor_period="Daily",
+                action_level="Immediate",
+                source="Risk Engine",
+                executive_action="Escalate",
+                evidence={"count": r.get("evidence_count", 0)},
+            ))
+
+    # ── NARRATIVE ACCELERATION ────────────────────────────────────────────────
+    for nar in narratives:
+        name = nar["narrative"]
+        momentum = nar["momentum"]
+        direction = nar["momentum_direction"]
+        sentiment = nar["sentiment_label"]
+        sov = nar["share_of_voice"]
+        weight = STRATEGIC_NARRATIVES.get(name, {}).get("weight", 1.0)
+
+        # High-weight narrative surging negatively
+        if direction == "rising" and momentum > 200 and sentiment == "negative" and weight >= 1.2:
+            items.append(_make_item(
+                title=f"{name} — Negative Surge",
+                why=f"{name} discourse surged {momentum:.0f}% with negative sentiment. {sov:.0f}% share of voice.",
+                priority="Critical" if momentum > 400 else "High",
+                reason=f"High-weight narrative ({weight}) with large negative momentum spike requires immediate attention.",
+                monitor_period="Daily",
+                action_level="Immediate" if momentum > 400 else "Within 48 hours",
+                source="Narrative Intelligence",
+                executive_action="Escalate" if momentum > 400 else "Act",
+                evidence={"count": nar["count"], "momentum": momentum},
+            ))
+        # Major narrative surge — any sentiment
+        elif direction == "rising" and momentum > 300 and weight >= 1.2:
+            items.append(_make_item(
+                title=f"{name} — Significant Acceleration",
+                why=f"{name} coverage accelerated {momentum:.0f}% — the largest sin
+
+=== GET_TOP_INFLUENCE_STAKEHOLDERS (first 40 lines) ===
+def get_top_influence_stakeholders(db: Session, limit: int = 10, days: int = 30) -> list:
+    """
+    Returns stakeholders ranked by composite_index, computing fresh.
+
+    PERFORMANCE: this now computes mentions, momentum, narrative impact,
+    relationship strength, and opportunity relevance for ALL active
+    stakeholders using batched single-pass helpers, instead of calling
+    compute_stakeholder_influence() (which independently re-scans the post
+    table) once per stakeholder. Measured at 87s for 45 stakeholders
+    before this fix; the batched version should complete in well under a
+    second for the same data volume.
+
+    V6.2 Phase A: reads from stakeholder_influence_profiles when fresh
+    data exists (written within last 25h by ingest pipeline).
+    """
+    materialised = _get_top_influence_from_materialised(db, limit, days)
+    if materialised is not None:
+        return materialised
+    stakeholders = db.query(StakeholderRegistry).filter(StakeholderRegistry.is_active == True).all()
+
+    mentions = compute_stakeholder_mentions(db, days)
+    momentum_scores = _compute_momentum_scores_for_all(db, days)
+    relationship_scores = _relationship_strength_scores_for_all(db)
+    opportunity_scores = _opportunity_relevance_scores_for_all(db)
+    narrative_impact_score = _narrative_impact_score_for_all(db, days)  # same value for every stakeholder this period
+
+    results = []
+    for s in stakeholders:
+        data = mentions.get(s.id, {"mention_count": 0, "source_count": 0})
+        mention_count = data["mention_count"]
+        source_count = data["source_count"]
+        if mention_count == 0:
+            continue  # don't rank stakeholders with zero discourse presence
+
+        influence_score = min(100.0, math.log1p(mention_count) * 12)
+        engagement_priority_score = min(100.0, min(70.0, math.log1p(mention_count) * 10) + min(30.0, source_count * 4))
+        momentum_score = momentum_scores.get(s.id, 0.0)
+        relationship_strength_score = relationship_scores.get(s.id, 0.0)
+        opportunity_relevance_score = opportunity_scores.get(s.id, 0.0)
+
+
+=== GENERATE_OPPORTUNITY_ASSESSMENTS (first 40 lines) ===
+def generate_opportunity_assessments(db: Session, days: int = 30) -> dict:
+    """
+    The core SOI function: scans discourse for opportunity signals, and for
+    every signal at or above MIN_MENTIONS_FOR_ASSESSMENT, either creates a
+    new OpportunityAssessment (status=DETECTED) or updates the evidence
+    count on an existing OPEN one for the same opportunity_registry_id
+    created within the last 30 days — avoiding the kind of duplicate-row
+    accumulation found and fixed in V5.9's recommendation tracker.
+
+    Returns {"created": int, "updated": int, "below_threshold": int}.
+    """
+    signals = compute_opportunity_signals(db, days)
+    created = 0
+    updated = 0
+    below_threshold = 0
+    recent_cutoff = datetime.now(timezone.utc) - timedelta(days=30)
+
+    active_statuses = [
+        OpportunityPipelineStatus.DETECTED, OpportunityPipelineStatus.ASSESSED,
+        OpportunityPipelineStatus.ENGAGED, OpportunityPipelineStatus.IN_PROGRESS,
+        OpportunityPipelineStatus.ADVANCED,
+    ]
+
+    for opp_id, data in signals.items():
+        if data["mention_count"] < MIN_MENTIONS_FOR_ASSESSMENT:
+            below_threshold += 1
+            continue
+
+        existing = db.query(OpportunityAssessment).filter(
+            OpportunityAssessment.opportunity_registry_id == opp_id,
+            OpportunityAssessment.status.in_(active_statuses),
+            OpportunityAssessment.created_at >= recent_cutoff,
+        ).order_by(OpportunityAssessment.created_at.desc()).first()
+
+        stakeholders = _find_aligned_stakeholders(db, opp_id, days)
+        stakeholders_json = json.dumps(stakeholders[:10])
+        ranked_first = json.dumps([s["name"] for s in stakeholders[:3]])
+
+        if existing:
+            existing.evidence_post_count = data["mention_count"]
+
+=== GET_NARRATIVE_ANALYSIS ===
+def get_narrative_analysis(db, days: int = 7) -> list[dict]:
+    """
+    Compute share of voice, momentum, sentiment, and confidence for each narrative.
+    This is the core of the Strategic Intelligence layer.
+
+    V6.2 perf fix: memoized per (session, days), no time-based expiry.
+    V6.2 Phase A materialised intelligence: reads from narrative_trends
+    table when fresh data exists (written within last 25h), falling back
+    to live computation otherwise. Eliminates the ~3.4s post table scan
+    on cache-cold requests when the ingest pipeline has run.
+    """
+    cache_key = (id(db), days)
+    if cache_key in _narrative_analysis_cache:
+        return _narrative_analysis_cache[cache_key]
+    result = _get_narrative_analysis_from_materialised(db, days)
+    if result is None:
+        result = _get_narrative_analysis_uncached(db, days)
+    _narrative_analysis_cache[cache_key] = result
+    if len(_narrative_analysis_cache) > _NARRATIVE_ANALYSIS_CACHE_MAX_SIZE:
+        oldest_key = next(iter(_narrative_analysis_cache))
+        del _narrative_analysis_cache[oldest_key]
+    return result
+
+
+=== GENERATE_GNEI_INTELLIGENCE (first 30 lines) ===
+def generate_gnei_intelligence(db: Session, days: int = 7) -> dict:
+    """Generate full GNEI intelligence module."""
+    from app.analytics.engine import compute_all_metrics
+    from app.services.source_quality import get_source_quality_report
+
+    narratives = get_narrative_analysis(db, days)
+    metrics = compute_all_metrics(db, max(days, 30))
+    source_quality = get_source_quality_report(db, days)
+
+    score_data = compute_gnei_score(narratives, metrics)
+    assessment = generate_gnei_assessment(score_data, narratives)
+
+    # Narrative breakdown
+    gnei_narratives = [n for n in narratives if n["narrative"] in GNEI_NARRATIVES]
+
+    # Emerging global narratives
+    emerging = sorted(
+        [n for n in narratives if n["momentum_direction"] == "rising" and n["momentum"] > 50],
+        key=lambda x: x["momentum"], reverse=True
+    )[:3]
+
+    # Outlook
+    score = score_data["gnei_score"]
+    direction = score_data["diaspora_direction"]
+
+    if direction == "rising":
+        outlook = f"The GNEI outlook is positive. Current upward momentum in diaspora engagement discourse suggests the index will strengthen over the next 14 days. This is an optimal period for community outreach and strategic communications."
+    elif direction == "falling":
+        outlook = f"GNEI momentum is declining. Monitor for stabilisation over the next 7 days. If the decline persists, consider targeted diaspora engagement initiatives to reverse the trend."
+    else:

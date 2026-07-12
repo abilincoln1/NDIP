@@ -1,0 +1,167 @@
+
+======================================================================
+  TABLE: normalised_posts
+======================================================================
+  Row count: 13,870
+  Total size (table + indexes): 18 MB
+  Indexes (12):
+    ix_norm_platform_date (648 kB): CREATE INDEX ix_norm_platform_date ON public.normalised_posts USING btree (source_platform, published_at)
+    ix_norm_query_date (1296 kB): CREATE INDEX ix_norm_query_date ON public.normalised_posts USING btree (query_tag, published_at)
+    ix_norm_sentiment_date (768 kB): CREATE INDEX ix_norm_sentiment_date ON public.normalised_posts USING btree (sentiment_label, published_at)
+    ix_normalised_posts_id (448 kB): CREATE INDEX ix_normalised_posts_id ON public.normalised_posts USING btree (id)
+    ix_normalised_posts_ingested_at (600 kB): CREATE INDEX ix_normalised_posts_ingested_at ON public.normalised_posts USING btree (ingested_at)
+    ix_normalised_posts_nlp_processed (144 kB): CREATE INDEX ix_normalised_posts_nlp_processed ON public.normalised_posts USING btree (nlp_processed)
+    ix_normalised_posts_published_at (456 kB): CREATE INDEX ix_normalised_posts_published_at ON public.normalised_posts USING btree (published_at)
+    ix_normalised_posts_query_tag (184 kB): CREATE INDEX ix_normalised_posts_query_tag ON public.normalised_posts USING btree (query_tag)
+    ix_normalised_posts_sentiment_label (200 kB): CREATE INDEX ix_normalised_posts_sentiment_label ON public.normalised_posts USING btree (sentiment_label)
+    ix_normalised_posts_source_platform (208 kB): CREATE INDEX ix_normalised_posts_source_platform ON public.normalised_posts USING btree (source_platform)
+    ix_normalised_posts_source_post_id (528 kB): CREATE INDEX ix_normalised_posts_source_post_id ON public.normalised_posts USING btree (source_post_id)
+    normalised_posts_pkey (592 kB) [UNIQUE, PK]: CREATE UNIQUE INDEX normalised_posts_pkey ON public.normalised_posts USING btree (id)
+
+======================================================================
+  TABLE: stakeholder_registry
+======================================================================
+  Row count: 69
+  Total size (table + indexes): 168 kB
+  Indexes (7):
+    ix_stakeholder_category_active (16 kB): CREATE INDEX ix_stakeholder_category_active ON public.stakeholder_registry USING btree (category, is_active)
+    ix_stakeholder_registry_category (16 kB): CREATE INDEX ix_stakeholder_registry_category ON public.stakeholder_registry USING btree (category)
+    ix_stakeholder_registry_id (16 kB): CREATE INDEX ix_stakeholder_registry_id ON public.stakeholder_registry USING btree (id)
+    ix_stakeholder_registry_is_active (16 kB): CREATE INDEX ix_stakeholder_registry_is_active ON public.stakeholder_registry USING btree (is_active)
+    ix_stakeholder_registry_name (16 kB): CREATE INDEX ix_stakeholder_registry_name ON public.stakeholder_registry USING btree (name)
+    ix_stakeholder_registry_type (16 kB): CREATE INDEX ix_stakeholder_registry_type ON public.stakeholder_registry USING btree (stakeholder_type)
+    stakeholder_registry_pkey (16 kB) [UNIQUE, PK]: CREATE UNIQUE INDEX stakeholder_registry_pkey ON public.stakeholder_registry USING btree (id)
+
+======================================================================
+  TABLE: stakeholder_relationships
+======================================================================
+  Row count: 46
+  Total size (table + indexes): 144 kB
+  Indexes (8):
+    ix_relationship_from_type (16 kB): CREATE INDEX ix_relationship_from_type ON public.stakeholder_relationships USING btree (from_stakeholder_id, relationship_type)
+    ix_relationship_to_type (16 kB): CREATE INDEX ix_relationship_to_type ON public.stakeholder_relationships USING btree (to_stakeholder_id, relationship_type)
+    ix_stakeholder_relationships_from_stakeholder_id (16 kB): CREATE INDEX ix_stakeholder_relationships_from_stakeholder_id ON public.stakeholder_relationships USING btree (from_stakeholder_id)
+    ix_stakeholder_relationships_id (16 kB): CREATE INDEX ix_stakeholder_relationships_id ON public.stakeholder_relationships USING btree (id)
+    ix_stakeholder_relationships_is_active (16 kB): CREATE INDEX ix_stakeholder_relationships_is_active ON public.stakeholder_relationships USING btree (is_active)
+    ix_stakeholder_relationships_relationship_type (16 kB): CREATE INDEX ix_stakeholder_relationships_relationship_type ON public.stakeholder_relationships USING btree (relationship_type)
+    ix_stakeholder_relationships_to_stakeholder_id (16 kB): CREATE INDEX ix_stakeholder_relationships_to_stakeholder_id ON public.stakeholder_relationships USING btree (to_stakeholder_id)
+    stakeholder_relationships_pkey (16 kB) [UNIQUE, PK]: CREATE UNIQUE INDEX stakeholder_relationships_pkey ON public.stakeholder_relationships USING btree (id)
+
+======================================================================
+  TABLE: recommendation_records
+======================================================================
+  Row count: 434
+  Total size (table + indexes): 552 kB
+  Indexes (9):
+    ix_recommendation_narrative_created (48 kB): CREATE INDEX ix_recommendation_narrative_created ON public.recommendation_records USING btree (narrative, created_at)
+    ix_recommendation_records_created_at (32 kB): CREATE INDEX ix_recommendation_records_created_at ON public.recommendation_records USING btree (created_at)
+    ix_recommendation_records_id (32 kB): CREATE INDEX ix_recommendation_records_id ON public.recommendation_records USING btree (id)
+    ix_recommendation_records_module (16 kB): CREATE INDEX ix_recommendation_records_module ON public.recommendation_records USING btree (module)
+    ix_recommendation_records_narrative (16 kB): CREATE INDEX ix_recommendation_records_narrative ON public.recommendation_records USING btree (narrative)
+    ix_recommendation_records_recommendation_category (16 kB): CREATE INDEX ix_recommendation_records_recommendation_category ON public.recommendation_records USING btree (recommendation_category)
+    ix_recommendation_records_status (16 kB): CREATE INDEX ix_recommendation_records_status ON public.recommendation_records USING btree (status)
+    ix_recommendation_status_created (32 kB): CREATE INDEX ix_recommendation_status_created ON public.recommendation_records USING btree (status, created_at)
+    recommendation_records_pkey (32 kB) [UNIQUE, PK]: CREATE UNIQUE INDEX recommendation_records_pkey ON public.recommendation_records USING btree (id)
+
+======================================================================
+  TABLE: opportunity_assessments
+======================================================================
+  Row count: 7
+  Total size (table + indexes): 184 kB
+  Indexes (8):
+    ix_opportunity_assessments_category (16 kB): CREATE INDEX ix_opportunity_assessments_category ON public.opportunity_assessments USING btree (category)
+    ix_opportunity_assessments_created_at (16 kB): CREATE INDEX ix_opportunity_assessments_created_at ON public.opportunity_assessments USING btree (created_at)
+    ix_opportunity_assessments_id (16 kB): CREATE INDEX ix_opportunity_assessments_id ON public.opportunity_assessments USING btree (id)
+    ix_opportunity_assessments_opportunity_registry_id (16 kB): CREATE INDEX ix_opportunity_assessments_opportunity_registry_id ON public.opportunity_assessments USING btree (opportunity_registry_id)
+    ix_opportunity_assessments_status (16 kB): CREATE INDEX ix_opportunity_assessments_status ON public.opportunity_assessments USING btree (status)
+    ix_opportunity_category_status (16 kB): CREATE INDEX ix_opportunity_category_status ON public.opportunity_assessments USING btree (category, status)
+    ix_opportunity_status_created (16 kB): CREATE INDEX ix_opportunity_status_created ON public.opportunity_assessments USING btree (status, created_at)
+    opportunity_assessments_pkey (16 kB) [UNIQUE, PK]: CREATE UNIQUE INDEX opportunity_assessments_pkey ON public.opportunity_assessments USING btree (id)
+
+======================================================================
+  TABLE: opportunity_alignment_scores
+======================================================================
+  Row count: 966
+  Total size (table + indexes): 336 kB
+  Indexes (6):
+    ix_alignment_opportunity_stakeholder (16 kB): CREATE INDEX ix_alignment_opportunity_stakeholder ON public.opportunity_alignment_scores USING btree (opportunity_id, stakeholder_id)
+    ix_opportunity_alignment_scores_computed_at (40 kB): CREATE INDEX ix_opportunity_alignment_scores_computed_at ON public.opportunity_alignment_scores USING btree (computed_at)
+    ix_opportunity_alignment_scores_id (40 kB): CREATE INDEX ix_opportunity_alignment_scores_id ON public.opportunity_alignment_scores USING btree (id)
+    ix_opportunity_alignment_scores_opportunity_id (16 kB): CREATE INDEX ix_opportunity_alignment_scores_opportunity_id ON public.opportunity_alignment_scores USING btree (opportunity_id)
+    ix_opportunity_alignment_scores_stakeholder_id (16 kB): CREATE INDEX ix_opportunity_alignment_scores_stakeholder_id ON public.opportunity_alignment_scores USING btree (stakeholder_id)
+    opportunity_alignment_scores_pkey (40 kB) [UNIQUE, PK]: CREATE UNIQUE INDEX opportunity_alignment_scores_pkey ON public.opportunity_alignment_scores USING btree (id)
+
+======================================================================
+  TABLE: named_entities
+======================================================================
+  Row count: 93,703
+  Total size (table + indexes): 20 MB
+  Indexes (8):
+    ix_entity_date (808 kB): CREATE INDEX ix_entity_date ON public.named_entities USING btree (date_bucket)
+    ix_entity_text_label (2544 kB): CREATE INDEX ix_entity_text_label ON public.named_entities USING btree (text, label)
+    ix_named_entities_date_bucket (808 kB): CREATE INDEX ix_named_entities_date_bucket ON public.named_entities USING btree (date_bucket)
+    ix_named_entities_id (2064 kB): CREATE INDEX ix_named_entities_id ON public.named_entities USING btree (id)
+    ix_named_entities_label (616 kB): CREATE INDEX ix_named_entities_label ON public.named_entities USING btree (label)
+    ix_named_entities_post_id (1152 kB): CREATE INDEX ix_named_entities_post_id ON public.named_entities USING btree (post_id)
+    ix_named_entities_text (2272 kB): CREATE INDEX ix_named_entities_text ON public.named_entities USING btree (text)
+    named_entities_pkey (2064 kB) [UNIQUE, PK]: CREATE UNIQUE INDEX named_entities_pkey ON public.named_entities USING btree (id)
+
+======================================================================
+  TABLE: stakeholder_engagements
+======================================================================
+  Row count: 0
+  Total size (table + indexes): 48 kB
+  Indexes (5):
+    ix_engagement_legacy_id (8192 bytes): CREATE INDEX ix_engagement_legacy_id ON public.stakeholder_engagements USING btree (source_legacy_id)
+    ix_engagement_recommendation (8192 bytes): CREATE INDEX ix_engagement_recommendation ON public.stakeholder_engagements USING btree (recommendation_id)
+    ix_engagement_stakeholder_event (8192 bytes): CREATE INDEX ix_engagement_stakeholder_event ON public.stakeholder_engagements USING btree (stakeholder_id, event_type)
+    stakeholder_engagements_pkey (8192 bytes) [UNIQUE, PK]: CREATE UNIQUE INDEX stakeholder_engagements_pkey ON public.stakeholder_engagements USING btree (id)
+    uq_engagement_legacy_event (8192 bytes) [UNIQUE]: CREATE UNIQUE INDEX uq_engagement_legacy_event ON public.stakeholder_engagements USING btree (source_legacy_id, event_type)
+
+======================================================================
+  TABLE: stakeholder_influence_profiles
+======================================================================
+  Row count: 0
+  Total size (table + indexes): 40 kB
+  Indexes (5):
+    ix_influence_profile_stakeholder_time (8192 bytes): CREATE INDEX ix_influence_profile_stakeholder_time ON public.stakeholder_influence_profiles USING btree (stakeholder_id, computed_at)
+    ix_stakeholder_influence_profiles_computed_at (8192 bytes): CREATE INDEX ix_stakeholder_influence_profiles_computed_at ON public.stakeholder_influence_profiles USING btree (computed_at)
+    ix_stakeholder_influence_profiles_id (8192 bytes): CREATE INDEX ix_stakeholder_influence_profiles_id ON public.stakeholder_influence_profiles USING btree (id)
+    ix_stakeholder_influence_profiles_stakeholder_id (8192 bytes): CREATE INDEX ix_stakeholder_influence_profiles_stakeholder_id ON public.stakeholder_influence_profiles USING btree (stakeholder_id)
+    stakeholder_influence_profiles_pkey (8192 bytes) [UNIQUE, PK]: CREATE UNIQUE INDEX stakeholder_influence_profiles_pkey ON public.stakeholder_influence_profiles USING btree (id)
+
+======================================================================
+  TABLE: stakeholder_momentum_snapshots
+======================================================================
+  Row count: 0
+  Total size (table + indexes): 40 kB
+  Indexes (5):
+    ix_momentum_stakeholder_time (8192 bytes): CREATE INDEX ix_momentum_stakeholder_time ON public.stakeholder_momentum_snapshots USING btree (stakeholder_id, snapshot_at)
+    ix_stakeholder_momentum_snapshots_id (8192 bytes): CREATE INDEX ix_stakeholder_momentum_snapshots_id ON public.stakeholder_momentum_snapshots USING btree (id)
+    ix_stakeholder_momentum_snapshots_snapshot_at (8192 bytes): CREATE INDEX ix_stakeholder_momentum_snapshots_snapshot_at ON public.stakeholder_momentum_snapshots USING btree (snapshot_at)
+    ix_stakeholder_momentum_snapshots_stakeholder_id (8192 bytes): CREATE INDEX ix_stakeholder_momentum_snapshots_stakeholder_id ON public.stakeholder_momentum_snapshots USING btree (stakeholder_id)
+    stakeholder_momentum_snapshots_pkey (8192 bytes) [UNIQUE, PK]: CREATE UNIQUE INDEX stakeholder_momentum_snapshots_pkey ON public.stakeholder_momentum_snapshots USING btree (id)
+
+======================================================================
+  TABLE: narrative_trends
+======================================================================
+  Row count: 0
+  Total size (table + indexes): 48 kB
+  Indexes (5):
+    ix_narrative_date (8192 bytes): CREATE INDEX ix_narrative_date ON public.narrative_trends USING btree (narrative, date_bucket)
+    ix_narrative_trends_date_bucket (8192 bytes): CREATE INDEX ix_narrative_trends_date_bucket ON public.narrative_trends USING btree (date_bucket)
+    ix_narrative_trends_id (8192 bytes): CREATE INDEX ix_narrative_trends_id ON public.narrative_trends USING btree (id)
+    ix_narrative_trends_narrative (8192 bytes): CREATE INDEX ix_narrative_trends_narrative ON public.narrative_trends USING btree (narrative)
+    narrative_trends_pkey (8192 bytes) [UNIQUE, PK]: CREATE UNIQUE INDEX narrative_trends_pkey ON public.narrative_trends USING btree (id)
+
+======================================================================
+  TABLE: stakeholder_watchlist
+======================================================================
+  Row count: 0
+  Total size (table + indexes): 16 kB
+  Indexes (1):
+    stakeholder_watchlist_pkey (8192 bytes) [UNIQUE, PK]: CREATE UNIQUE INDEX stakeholder_watchlist_pkey ON public.stakeholder_watchlist USING btree (id)
+
+======================================================================
+  INDEX AUDIT COMPLETE
+======================================================================

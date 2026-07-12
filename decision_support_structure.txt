@@ -1,0 +1,3 @@
+36:def generate_decision_support(db: Session, days: int) -> dict:
+421:def _enrich_and_track_recommendations(db: Session, result: dict, days: int) -> None:
+492:def _generate_decision_summary(immediate, near_term, strategic, monitoring,

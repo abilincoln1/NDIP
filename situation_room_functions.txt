@@ -1,0 +1,9 @@
+12:def situation_room(
+38:def executive_brief(
+91:def narrative_comparisons(
+101:def source_quality(
+111:def data_quality(
+120:def all_risks(
+126:    return {"risks": detect_all_risks(db, days)}
+130:def all_opportunities(
+136:    return {"opportunities": detect_all_opportunities(db, days)}

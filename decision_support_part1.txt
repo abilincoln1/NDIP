@@ -1,0 +1,185 @@
+def generate_decision_support(db: Session, days: int) -> dict:
+    """
+    Generate structured decision support from intelligence findings.
+    Returns time-horizoned actions across Immediate, Near-Term, Strategic, Monitoring.
+    """
+    from app.analytics.strategic_narratives import get_narrative_analysis
+    from app.services.risk_opportunity import detect_all_risks, detect_all_opportunities
+    from app.services.source_quality import get_source_quality_report
+    from app.services.election_intelligence import ELECTION_DATE
+
+    narratives = get_narrative_analysis(db, days)
+    risks = detect_all_risks(db, days)
+    opportunities = detect_all_opportunities(db, days)
+    source_quality = get_source_quality_report(db, days)
+
+    now = datetime.now(timezone.utc)
+    days_to_election = (ELECTION_DATE - now).days
+
+    immediate = []   # 7 days
+    near_term = []   # 30 days
+    strategic = []   # 90 days
+    monitoring = []  # ongoing
+
+    gov = next((n for n in narratives if n["narrative"] == "Governance"), None)
+    sec = next((n for n in narratives if n["narrative"] == "Security"), None)
+    econ = next((n for n in narratives if n["narrative"] == "Economy"), None)
+    diaspora = next((n for n in narratives if n["narrative"] == "Global Nigerian Engagement"), None)
+    elections = next((n for n in narratives if n["narrative"] == "Elections & Democracy"), None)
+    media = next((n for n in narratives if n["narrative"] == "Media Representation"), None)
+    investment = next((n for n in narratives if n["narrative"] == "Investment"), None)
+
+    # ── CRITICAL RISKS → ESCALATE ─────────────────────────────────────────────
+    for r in [r for r in risks if r.get("level") == "Critical"]:
+        immediate.append({
+            "category": "ESCALATE",
+            "priority": "Critical",
+            "issue": r["title"],
+            "reasoning": r["detail"],
+            "action": f"Escalate to senior leadership immediately. {r.get('action', 'Commission emergency review.')}",
+            "expected_outcome": "Immediate leadership awareness and coordinated response.",
+            "evidence": f"{r.get('evidence_count', 0)} records",
+        })
+
+    # ── GOVERNANCE ────────────────────────────────────────────────────────────
+    if gov:
+        sov = gov["share_of_voice"]
+        momentum = gov["momentum"]
+        direction = gov["momentum_direction"]
+        sentiment = gov["sentiment_label"]
+
+        if direction == "rising" and momentum > 200:
+            immediate.append({
+                "category": "INVESTIGATE",
+                "priority": "High",
+                "issue": f"Governance discourse surged {momentum:.0f}%",
+                "reasoning": (
+                    f"Governance coverage accelerated {momentum:.0f}% — an exceptional surge "
+                    f"indicating a specific triggering event. Without understanding the driver, "
+                    f"RTIFN risks responding to the wrong issue."
+                ),
+                "action": (
+                    "Review the top 10 governance articles from the past 48 hours to identify "
+                    "the specific development driving this surge. Determine whether it relates "
+                    "to a ministerial action, policy announcement, or accountability event."
+                ),
+                "expected_outcome": "Identified trigger enables targeted, informed community response.",
+                "evidence": f"{gov['count']} governance records",
+            })
+
+        if sentiment == "positive" and sov > 15:
+            immediate.append({
+                "category": "ENGAGE",
+                "priority": "High",
+                "issue": f"Governance at {sov:.0f}% share of voice with positive sentiment",
+                "reasoning": (
+                    "Positive governance discourse creates a favourable window for diaspora-government "
+                    "engagement. This type of window typically lasts 7-14 days before news cycle shifts."
+                ),
+                "action": (
+                    "Prepare and publish a RTIFN statement positioning the diaspora community as "
+                    "a constructive stakeholder in Nigerian governance. Focus on institutional "
+                    "quality and accountability — not partisan positions."
+                ),
+                "expected_outcome": "Established RTIFN voice in governance discourse during a peak positive window.",
+                "evidence": f"{gov['count']} governance records",
+            })
+        elif sentiment == "negative" and sov > 15:
+            near_term.append({
+                "category": "PREPARE",
+                "priority": "High",
+                "issue": f"Negative governance sentiment at {sov:.0f}% share of voice",
+                "reasoning": (
+                    "Negative governance discourse may indicate declining institutional trust. "
+                    "Diaspora communities need trusted interpretation of governance developments "
+                    "to maintain informed engagement."
+                ),
+                "action": (
+                    "Develop a governance situation brief for diaspora community leaders. "
+                    "Summarise the key governance issues driving discourse and provide "
+                    "context on institutional processes. Maintain non-partisan framing."
+                ),
+                "expected_outcome": "Informed diaspora community with reduced uncertainty about governance developments.",
+                "evidence": f"{gov['count']} governance records",
+            })
+
+        monitoring.append({
+            "category": "MONITOR",
+            "priority": "Medium",
+            "issue": "Governance narrative direction",
+            "reasoning": "Governance is the dominant narrative. Sentiment direction is the most important leading indicator of public confidence.",
+            "action": "Track governance sentiment weekly. Flag if sentiment shifts from positive to negative — this is an early warning indicator.",
+            "expected_outcome": "Early detection of governance trust erosion.",
+            "evidence": f"{gov['count']} records, {gov['source_count']} sources",
+        })
+
+    # ── SECURITY ──────────────────────────────────────────────────────────────
+    if sec:
+        sov = sec["share_of_voice"]
+        direction = sec["momentum_direction"]
+        momentum = sec["momentum"]
+        sentiment = sec["sentiment_label"]
+
+        if direction == "rising" and momentum > 100:
+            immediate.append({
+                "category": "ESCALATE",
+                "priority": "High",
+                "issue": f"Security discourse accelerating — up {momentum:.0f}%",
+                "reasoning": (
+                    "Rapid security discourse growth may indicate an emerging security situation. "
+                    "Diaspora communities with family in affected areas need timely, accurate information."
+                ),
+                "action": (
+                    f"Increase monitoring frequency for security-related narratives from weekly to "
+                    f"daily over the next 30 days, due to a {momentum:.0f}% acceleration in security "
+                    f"discourse. Identify geographic concentration — which states are driving the "
+                    f"increase. Prepare a diaspora community security advisory within 7 days if "
+                    f"incidents are concentrated in high-diaspora-origin states (Lagos, Edo, Anambra, Delta)."
+                ),
+                "expected_outcome": "Diaspora community informed and reassured through timely, accurate security context.",
+                "evidence": f"{sec['count']} security records",
+            })
+
+        if sentiment == "negative" and sov > 12:
+            near_term.append({
+                "category": "PREPARE",
+                "priority": "High",
+                "issue": f"Negative security discourse at {sov:.0f}%",
+                "reasoning": (
+                    "Negative security coverage suppresses diaspora willingness to visit, invest, "
+                    "and encourage return migration. Proactive community briefing prevents "
+                    "disproportionate anxiety from media coverage."
+                ),
+                "action": (
+                    "Prepare a security situation community brief for diaspora audiences. "
+                    "Focus on geographic specificity — distinguish affected regions from "
+                    "unaffected areas. Avoid amplifying alarmist narratives. "
+                    "Provide practical guidance for community members with family in affected areas."
+                ),
+                "expected_outcome": "Reduced diaspora anxiety, maintained engagement levels, and RTIFN positioned as trusted information source.",
+                "evidence": f"{sec['count']} security records",
+            })
+
+        monitoring.append({
+            "category": "MONITOR",
+            "priority": "High",
+            "issue": "Security narrative — geographic concentration",
+            "reasoning": "Security situations can escalate within hours. Geographic concentration in diaspora-origin states triggers disproportionate community response.",
+            "action": "Monitor security discourse daily. Track geographic keywords (state names, regions). Flag if security-election narrative overlap emerges.",
+            "expected_outcome": "Early warning of security developments affecting diaspora communities.",
+            "evidence": f"{sec['count']} records",
+        })
+
+    # ── ECONOMY ───────────────────────────────────────────────────────────────
+    if econ:
+        sov = econ["share_of_voice"]
+        sentiment = econ["sentiment_label"]
+        direction = econ["momentum_direction"]
+
+        if sentiment == "negative" and direction == "rising":
+            near_term.append({
+                "category": "ENGAGE",
+                "priority": "Medium",
+                "issue": f"Negative economic discourse growing ({sov:.0f}% share of voice)",
+                "reasoning": (
+                    "Negative economic discourse directly affects diaspora remittance behaviour "

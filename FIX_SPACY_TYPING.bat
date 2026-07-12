@@ -1,0 +1,11 @@
+@echo off
+docker exec agora-backend-1 python -c "open('/tmp/spacy_fix.b64','w').write('')"
+docker exec agora-backend-1 python -c "open('/tmp/spacy_fix.b64','a').write('CnBhdGggPSAnL3Vzci9sb2NhbC9saWIvcHl0aG9uMy4xMi9zaXRlLXBhY2thZ2VzL3B5ZGFudGljL3YxL3R5cGluZy5weScKd2l0aCBvcGVuKHBhdGgpIGFzIGY6CiAgICBjID0gZi5yZWFkKCkKCiMgUmVtb3ZlIGFueSBicm9rZW4gcHJldmlvdXMgYXR0ZW1wdCBm')"
+docker exec agora-backend-1 python -c "open('/tmp/spacy_fix.b64','a').write('aXJzdApicm9rZW4gPSAndHJ5OlxuICAgICAgICByZXR1cm4gY2FzdCcKaWYgYnJva2VuIGluIGM6CiAgICAjIFJlc3RvcmUgb3JpZ2luYWwgbGluZQogICAgYyA9IGMucmVwbGFjZShicm9rZW4sICdyZXR1cm4gY2FzdCcpCgpvbGQgPSAncmV0dXJuIGNhc3QoQW55')"
+docker exec agora-backend-1 python -c "open('/tmp/spacy_fix.b64','a').write('LCB0eXBlXykuX2V2YWx1YXRlKGdsb2JhbG5zLCBsb2NhbG5zLCBzZXQoKSknCm5ldyA9ICcnJ3RyeToKICAgICAgICByZXR1cm4gY2FzdChBbnksIHR5cGVfKS5fZXZhbHVhdGUoZ2xvYmFsbnMsIGxvY2FsbnMsIGZyb3plbnNldCgpKQogICAgZXhjZXB0IFR5cGVF')"
+docker exec agora-backend-1 python -c "open('/tmp/spacy_fix.b64','a').write('cnJvcjoKICAgICAgICByZXR1cm4gY2FzdChBbnksIHR5cGVfKS5fZXZhbHVhdGUoZ2xvYmFsbnMsIGxvY2FsbnMsIHNldCgpKScnJwoKaWYgb2xkIGluIGM6CiAgICBjID0gYy5yZXBsYWNlKG9sZCwgbmV3KQogICAgd2l0aCBvcGVuKHBhdGgsICd3JykgYXMgZjoK')"
+docker exec agora-backend-1 python -c "open('/tmp/spacy_fix.b64','a').write('ICAgICAgICBmLndyaXRlKGMpCiAgICBwcmludCgncGF0Y2hlZCBzdWNjZXNzZnVsbHknKQplbGlmICdmcm96ZW5zZXQnIGluIGM6CiAgICBwcmludCgnYWxyZWFkeSBwYXRjaGVkJykKZWxzZToKICAgIHByaW50KCdFUlJPUjogcGF0dGVybiBub3QgZm91bmQnKQog')"
+docker exec agora-backend-1 python -c "open('/tmp/spacy_fix.b64','a').write('ICAgIyBTaG93IHJlbGV2YW50IGxpbmVzCiAgICBmb3IgaSwgbGluZSBpbiBlbnVtZXJhdGUoYy5zcGxpdChjaHIoMTApKVs2MDo3NV0sIDYwKToKICAgICAgICBwcmludChmJ3tpfToge3JlcHIobGluZSl9JykK')"
+docker exec agora-backend-1 python -c "import base64;exec(base64.b64decode(open('/tmp/spacy_fix.b64').read()).decode())"
+docker exec agora-backend-1 python -c "import spacy;nlp=spacy.load('en_core_web_sm');doc=nlp('Tinubu in Abuja');print('spaCy OK:',[(e.text,e.label_) for e in doc.ents])"
+pause

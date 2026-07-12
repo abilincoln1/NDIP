@@ -1,0 +1,149 @@
+def generate_election_implications_engine(elections: dict, phase: dict, days_to_election: int,
+                                           narratives: list, risks: list, opportunities: list) -> dict:
+    """
+    Decision-support layer: If current trends continue, what happens next?
+    Converts election metrics into forward-looking decision support.
+    """
+    sov = elections["share_of_voice"] if elections else 0
+    direction = elections["momentum_direction"] if elections else "stable"
+    momentum = elections["momentum"] if elections else 0
+    sentiment = elections["sentiment_label"] if elections else "neutral"
+
+    sec = next((n for n in narratives if n["narrative"] == "Security"), None)
+    gov = next((n for n in narratives if n["narrative"] == "Governance"), None)
+
+    # If current trends continue...
+    trend_implications = []
+
+    if direction == "rising" and momentum > 100:
+        trend_implications.append(
+            f"If the current {momentum:.0f}% acceleration in electoral discourse continues, "
+            f"electoral narratives will likely emerge as a top-3 discourse category within 2-4 weeks. "
+            f"This would signal entry into the early active campaign phase earlier than typical for this stage of the cycle."
+        )
+    elif sov < 5 and days_to_election > 180:
+        trend_implications.append(
+            f"If current low electoral discourse levels ({sov:.0f}%) persist, civic mobilisation will be "
+            f"delayed relative to historical Nigerian election patterns. This creates a window for proactive "
+            f"civic engagement organisations to establish narrative presence before campaign discourse dominates."
+        )
+
+    if sec and sec["share_of_voice"] > 15 and sec["sentiment_label"] == "negative":
+        trend_implications.append(
+            f"If elevated negative security discourse ({sec['share_of_voice']:.0f}%) continues approaching "
+            f"the election, it will increasingly intersect with electoral confidence narratives. Historical "
+            f"patterns suggest this intersection typically occurs 90-120 days before an election."
+        )
+
+    if gov and gov["sentiment_label"] == "negative":
+        trend_implications.append(
+            "If negative governance sentiment persists, it will likely erode confidence in electoral "
+            "institutions as the campaign period approaches — a pattern seen in the 2023 election cycle."
+        )
+
+    if not trend_implications:
+        trend_implications.append(
+            f"If current trends continue, the electoral discourse environment will develop consistent with "
+            f"a typical Nigerian pre-election pattern — gradual build from current {sov:.0f}% toward "
+            f"20-30% share of voice by 90 days ahead of the election."
+        )
+
+    # Increasing risks
+    escalating_risks = []
+    if days_to_election < 300 and sov < 3:
+        escalating_risks.append({
+            "risk": "Civic Engagement Deficit",
+            "trajectory": "Increasing",
+            "detail": "Low pre-election civic discourse reduces voter registration momentum and community preparedness.",
+        })
+    if sec and sec["momentum_direction"] == "rising" and sec["sentiment_label"] == "negative":
+        escalating_risks.append({
+            "risk": "Security-Election Intersection",
+            "trajectory": "Increasing",
+            "detail": "Rising negative security discourse approaching an election cycle historically correlates with reduced voter confidence.",
+        })
+    if gov and gov["sentiment_label"] == "negative" and gov["share_of_voice"] > 15:
+        escalating_risks.append({
+            "risk": "Institutional Trust Erosion",
+            "trajectory": "Watch",
+            "detail": "Negative governance sentiment in the pre-election period may transfer to electoral institution distrust.",
+        })
+
+    # Emerging opportunities
+    emerging_opps = []
+    if sov < 8 and direction == "rising":
+        emerging_opps.append({
+            "opportunity": "Early Electoral Narrative Leadership",
+            "window": "Now — 60 days",
+            "detail": "Early-stage electoral discourse growth creates a low-competition window to establish RTIFN as a trusted electoral information source.",
+        })
+    if sentiment == "positive":
+        emerging_opps.append({
+            "opportunity": "Positive Electoral Framing",
+            "window": "This period",
+            "detail": "Current positive electoral sentiment provides an opportunity to establish constructive democratic participation narratives before campaign discourse intensifies.",
+        })
+
+    # Leadership actions
+    leadership_actions = []
+    if days_to_election > 180:
+        leadership_actions.append({
+            "action": "Commission Electoral Engagement Strategy",
+            "priority": "Prepare",
+            "timing": "This month",
+            "detail": "Develop RTIFN's electoral observation and civic engagement framework before campaign discourse begins.",
+        })
+    if direction == "rising" and momentum > 100:
+        leadership_actions.append({
+            "action": "Monitor Electoral Acceleration",
+            "priority": "Act",
+            "timing": "Daily for next 7 days",
+            "detail": f"Electoral discourse surged {momentum:.0f}%. Identify the triggering event and assess implications for RTIFN positioning.",
+        })
+    leadership_actions.append({
+        "action": "Establish Election Intelligence Baseline",
+        "priority": "Monitor",
+        "timing": "Ongoing",
+        "detail": "Continue daily monitoring of electoral discourse. Establish monthly benchmarks for trajectory tracking.",
+    })
+
+    # Diaspora-specific actions
+    diaspora_actions = [
+        {
+            "action": "Diaspora Voter Education Programme",
+            "priority": "Prepare",
+            "detail": "Develop voter information resources for diaspora communities covering electoral registration, process, and rights.",
+        },
+        {
+            "action": "Election Observation Coordination",
+            "priority": "Monitor",
+            "detail": "Connect with established election observation organisations for diaspora community monitoring coordination.",
+        },
+    ]
+
+    # Escalation alerts
+    escalation_alerts = []
+    for r in risks:
+        if r.get("level") == "Critical":
+            escalation_alerts.append({
+                "alert": f"CRITICAL: {r['title']}",
+                "action_required": "Immediate leadership briefing",
+                "detail": r["detail"][:100],
+            })
+
+    return {
+        "trend_implications": trend_implications,
+        "escalating_risks": escalating_risks,
+        "emerging_opportunities": emerging_opps,
+        "leadership_actions": leadership_actions,
+        "diaspora_leadership_actions": diaspora_actions,
+        "escalation_alerts": escalation_alerts,
+        "decision_support_summary": (
+            f"With {days_to_election} days to the 2027 election and electoral discourse at {sov:.0f}% share of voice, "
+            f"RTIFN is in the {'preparation' if days_to_election > 180 else 'active engagement'} phase of its electoral intelligence cycle. "
+            f"{'Proactive positioning now will establish RTIFN credibility before the discourse space becomes contested.' if days_to_election > 180 else 'Active engagement is required to maintain RTIFN visibility in the increasingly competitive electoral discourse environment.'}"
+        ),
+    }
+
+# ─── Main entry point ─────────────────────────────────────────────────────────
+def generate_full_election_intelligence(db: Session, days: int = 30) -> dict:

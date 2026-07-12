@@ -1,0 +1,12 @@
+@echo off
+echo Deploying layout.tsx...
+docker exec agora-frontend-1 node -e "require('fs').mkdirSync('/app/src/app',{recursive:true});require('fs').writeFileSync('/tmp/fix_layout.tsx.b64','')"
+docker exec agora-frontend-1 node -e "require('fs').appendFileSync('/tmp/fix_layout.tsx.b64','aW1wb3J0IHR5cGUgeyBNZXRhZGF0YSB9IGZyb20gIm5leHQiOwppbXBvcnQgIi4vZ2xvYmFscy5jc3MiOwppbXBvcnQgIi4vZ2xvYmFscy1vdmVycmlkZS5jc3MiOwppbXBvcnQgU2lkZWJhciBmcm9tICJAL2NvbXBvbmVudHMvbGF5b3V0')"
+docker exec agora-frontend-1 node -e "require('fs').appendFileSync('/tmp/fix_layout.tsx.b64','L1NpZGViYXIiOwppbXBvcnQgQUlDb3BpbG90IGZyb20gIkAvY29tcG9uZW50cy91aS9BSUNvcGlsb3QiOwoKZXhwb3J0IGNvbnN0IG1ldGFkYXRhOiBNZXRhZGF0YSA9IHsKICB0aXRsZTogIk5ESVAgfCBOYXRpb25hbCAmIERpYXNwb3Jh')"
+docker exec agora-frontend-1 node -e "require('fs').appendFileSync('/tmp/fix_layout.tsx.b64','IEludGVsbGlnZW5jZSBQbGF0Zm9ybSIsCiAgZGVzY3JpcHRpb246ICJOYXRpb25hbCAmIERpYXNwb3JhIEludGVsbGlnZW5jZSBQbGF0Zm9ybSDigJQgVW5kZXJzdGFuZGluZyBOaWdlcmlhLiBVbmRlcnN0YW5kaW5nIHRoZSBEaWFzcG9y')"
+docker exec agora-frontend-1 node -e "require('fs').appendFileSync('/tmp/fix_layout.tsx.b64','YS4gSW5mb3JtaW5nIExlYWRlcnNoaXAuIiwKICBpY29uczogeyBpY29uOiAiL2ljb24uc3ZnIiB9LAp9OwoKZXhwb3J0IGRlZmF1bHQgZnVuY3Rpb24gUm9vdExheW91dCh7IGNoaWxkcmVuIH06IHsgY2hpbGRyZW46IFJlYWN0LlJlYWN0')"
+docker exec agora-frontend-1 node -e "require('fs').appendFileSync('/tmp/fix_layout.tsx.b64','Tm9kZSB9KSB7CiAgcmV0dXJuICgKICAgIDxodG1sIGxhbmc9ImVuIj4KICAgICAgPGJvZHkgY2xhc3NOYW1lPSJmbGV4IGgtc2NyZWVuIG92ZXJmbG93LWhpZGRlbiI+CiAgICAgICAgPFNpZGViYXIgLz4KICAgICAgICA8bWFpbiBjbGFz')"
+docker exec agora-frontend-1 node -e "require('fs').appendFileSync('/tmp/fix_layout.tsx.b64','c05hbWU9ImZsZXgtMSBvdmVyZmxvdy15LWF1dG8gYmctc2xhdGUtOTUwIHAtNiBsZzpwLTgiPgogICAgICAgICAge2NoaWxkcmVufQogICAgICAgIDwvbWFpbj4KICAgICAgICA8QUlDb3BpbG90IC8+CiAgICAgIDwvYm9keT4KICAgIDwv')"
+docker exec agora-frontend-1 node -e "require('fs').appendFileSync('/tmp/fix_layout.tsx.b64','aHRtbD4KICApOwp9Cg==')"
+docker exec agora-frontend-1 node -e "require('fs').writeFileSync('/app/src/app/layout.tsx',Buffer.from(require('fs').readFileSync('/tmp/fix_layout.tsx.b64','utf8'),'base64'));console.log('Written: /app/src/app/layout.tsx')"
+echo Done: layout.tsx

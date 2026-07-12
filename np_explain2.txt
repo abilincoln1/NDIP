@@ -1,0 +1,62 @@
+normalised_posts columns:
+  id: integer
+  source_platform: character varying
+  source_post_id: integer
+  external_id: character varying
+  text: text
+  language: character varying
+  geo_country: character varying
+  geo_region: character varying
+  url: character varying
+  published_at: timestamp with time zone
+  ingested_at: timestamp with time zone
+  query_tag: character varying
+  sentiment_label: character varying
+  sentiment_score: double precision
+  entities_json: text
+  topics_json: text
+  narrative_tags: text
+  nlp_processed: boolean
+  nlp_processed_at: timestamp with time zone
+
+normalised_posts indexes:
+  normalised_posts_pkey: CREATE UNIQUE INDEX normalised_posts_pkey ON public.normalised_posts USING btree (id)
+  ix_normalised_posts_ingested_at: CREATE INDEX ix_normalised_posts_ingested_at ON public.normalised_posts USING btree (ingested_at)
+  ix_norm_query_date: CREATE INDEX ix_norm_query_date ON public.normalised_posts USING btree (query_tag, published_at)
+  ix_normalised_posts_query_tag: CREATE INDEX ix_normalised_posts_query_tag ON public.normalised_posts USING btree (query_tag)
+  ix_normalised_posts_nlp_processed: CREATE INDEX ix_normalised_posts_nlp_processed ON public.normalised_posts USING btree (nlp_processed)
+  ix_normalised_posts_sentiment_label: CREATE INDEX ix_normalised_posts_sentiment_label ON public.normalised_posts USING btree (sentiment_label)
+  ix_normalised_posts_published_at: CREATE INDEX ix_normalised_posts_published_at ON public.normalised_posts USING btree (published_at)
+  ix_norm_platform_date: CREATE INDEX ix_norm_platform_date ON public.normalised_posts USING btree (source_platform, published_at)
+  ix_normalised_posts_source_platform: CREATE INDEX ix_normalised_posts_source_platform ON public.normalised_posts USING btree (source_platform)
+  ix_normalised_posts_id: CREATE INDEX ix_normalised_posts_id ON public.normalised_posts USING btree (id)
+  ix_normalised_posts_source_post_id: CREATE INDEX ix_normalised_posts_source_post_id ON public.normalised_posts USING btree (source_post_id)
+  ix_norm_sentiment_date: CREATE INDEX ix_norm_sentiment_date ON public.normalised_posts USING btree (sentiment_label, published_at)
+
+======================================================================
+  QUERY: NormalisedPost -- current 30d scan (what get_narrative_analysis actually runs)
+======================================================================
+Seq Scan on normalised_posts  (cost=0.00..1736.56 rows=10193 width=295) (actual time=0.773..460.139 rows=10224 loops=1)
+  Filter: (nlp_processed AND (text IS NOT NULL) AND (published_at >= '2026-05-31 22:27:27.356407+00'::timestamp with time zone))
+  Rows Removed by Filter: 3646
+  Buffers: shared hit=1563
+Planning:
+  Buffers: shared hit=154
+Planning Time: 28.142 ms
+Execution Time: 461.630 ms
+
+======================================================================
+  QUERY: NormalisedPost -- previous 30d scan (momentum calculation)
+======================================================================
+Bitmap Heap Scan on normalised_posts  (cost=50.05..1710.81 rows=1733 width=295) (actual time=8.988..10.915 rows=1705 loops=1)
+  Recheck Cond: ((published_at >= '2026-05-01 22:27:27.356407+00'::timestamp with time zone) AND (published_at < '2026-05-31 22:27:27.356407+00'::timestamp with time zone))
+  Filter: (nlp_processed AND (text IS NOT NULL))
+  Heap Blocks: exact=583
+  Buffers: shared hit=591
+  ->  Bitmap Index Scan on ix_normalised_posts_published_at  (cost=0.00..49.61 rows=1733 width=0) (actual time=8.817..8.818 rows=1707 loops=1)
+        Index Cond: ((published_at >= '2026-05-01 22:27:27.356407+00'::timestamp with time zone) AND (published_at < '2026-05-31 22:27:27.356407+00'::timestamp with time zone))
+        Buffers: shared hit=8
+Planning Time: 0.289 ms
+Execution Time: 11.202 ms
+
+Done.

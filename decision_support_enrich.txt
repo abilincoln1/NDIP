@@ -1,0 +1,72 @@
+def _enrich_and_track_recommendations(db: Session, result: dict, days: int) -> None:
+    """
+    V5.6 Phase A + B: add explicit time_horizon/confidence fields to every
+    recommendation (specificity requirement) and persist each one to the
+    RecommendationRecord table for automated effectiveness evaluation.
+    """
+    try:
+        from app.services.recommendation_tracker import record_recommendation
+    except Exception:
+        return  # tracker not available — degrade gracefully, decision support still works
+
+    horizon_map = {
+        "immediate_actions": "7 days",
+        "near_term_actions": "30 days",
+        "strategic_actions": "90 days",
+        "monitoring_actions": "Ongoing",
+    }
+    confidence_map = {
+        "Critical": "High", "High": "High", "Medium": "Medium", "Low": "Low",
+    }
+
+    for bucket, horizon in horizon_map.items():
+        for action in result.get(bucket, []):
+            action["time_horizon"] = horizon
+
+            # V5.8 Phase K — consult adaptive confidence weighting before falling
+            # back to the static priority-based map. This is the actual closed
+            # loop: past recommendation accuracy for this category now influences
+            # the confidence assigned to NEW recommendations of the same category.
+            if "confidence" not in action:
+                adaptive_confidence = None
+                try:
+                    from app.services.intelligence_learning import get_recommended_confidence
+                    adaptive_confidence = get_recommended_confidence(
+                        db, action.get("category", "MONITOR"), action.get("narrative")
+                    )
+                except Exception:
+                    adaptive_confidence = None
+                action["confidence"] = adaptive_confidence or confidence_map.get(action.get("priority", "Medium"), "Medium")
+
+            # Persist for tracking — best effort, never block the response
+            try:
+                narrative = action.get("narrative")
+                evidence_str = action.get("evidence", "")
+                trigger_value = None
+                try:
+                    # Extract leading numeric value from evidence strings like "300 governance records"
+                    digits = "".join(c for c in evidence_str.split()[0] if c.isdigit())
+                    trigger_value = float(digits) if digits else None
+                except (IndexError, ValueError):
+                    trigger_value = None
+
+                record_recommendation(
+                    db,
+                    narrative=narrative,
+                    recommendation_text=action.get("action", ""),
+                    category=action.get("category", "MONITOR"),
+                    priority=action.get("priority", "Medium"),
+                    confidence=action.get("confidence", "Medium"),
+                    time_horizon=horizon,
+                    supporting_evidence=action.get("reasoning") or evidence_str,
+                    expected_outcome=action.get("expected_outcome"),
+                    trigger_metric_name="share_of_voice",
+                    trigger_metric_value=trigger_value,
+                    period_days=days,
+                    module="decision_support",
+                )
+            except Exception:
+                continue
+
+
+def _generate_decision_summary(immediate, near_term, strategic, monitoring,

@@ -1,0 +1,17 @@
+13:def get_election_phase(days_to_election: int) -> dict:
+27:def generate_election_assessment(elections: dict, phase: dict, days: int, days_to_election: int) -> dict:
+90:def generate_election_why_it_matters(elections: dict, phase: dict, days_to_election: int, narratives: list) -> dict:
+152:def generate_election_implications(elections: dict, phase: dict, days_to_election: int) -> dict:
+201:def generate_election_risks(elections: dict, narratives: list, days_to_election: int) -> list:
+272:def generate_election_opportunities(elections: dict, narratives: list, days_to_election: int) -> list:
+325:def generate_election_outlook(elections: dict, phase: dict, days_to_election: int, risks: list, opportunities: list) -> dict:
+380:def generate_election_monitoring_priorities() -> list:
+442:def generate_election_confidence(elections: dict, source_quality: dict) -> dict:
+494:def generate_executive_election_briefing(
+542:def generate_election_implications_engine(elections: dict, phase: dict, days_to_election: int,
+629:    leadership_actions = []
+631:        leadership_actions.append({
+638:        leadership_actions.append({
+644:    leadership_actions.append({
+652:    diaspora_actions = [
+690:def generate_full_election_intelligence(db: Session, days: int = 30) -> dict:

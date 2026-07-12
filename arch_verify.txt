@@ -1,0 +1,105 @@
+/app/app/analytics/engine.py:84: SAWarning: Coercing Subquery object into a select() for use in IN(); please pass a select() construct explicitly
+  Participant.id.not_in(inactive_ids),
+======================================================================
+  LEADERSHIP PACK — CALL ORDER AND TIMING (cold cache)
+  Total: 34.55s
+======================================================================
+   0.030s  get_narrative_analysis [x13]
+   0.030s  _get_narrative_analysis_from_materialised
+   0.503s  compute_all_metrics [x8]
+   0.920s  generate_situation_room
+   0.920s  compute_all_metrics [x8]
+   0.984s  get_sentiment_trends [x5]
+   4.727s  get_narrative_analysis [x13]
+   4.727s  get_top_entities
+   5.421s  get_emerging_topics
+  14.339s  record_recommendation [x7]
+  14.385s  record_recommendation [x7]
+  14.392s  get_source_quality_report [x3]
+  14.416s  get_data_quality_report
+  14.719s  detect_all_risks [x2]
+  14.719s  compute_all_metrics [x8]
+  14.791s  get_narrative_analysis [x13]
+  14.791s  get_sentiment_trends [x5]
+  17.332s  detect_all_opportunities [x2]
+  17.332s  get_narrative_analysis [x13]
+  17.332s  compute_all_metrics [x8]
+  17.376s  get_sentiment_trends [x5]
+  20.208s  generate_watchlist
+  20.243s  get_narrative_analysis [x13]
+  20.243s  detect_all_risks [x2]
+  20.243s  compute_all_metrics [x8]
+  20.362s  get_narrative_analysis [x13]
+  20.362s  get_sentiment_trends [x5]
+  23.113s  detect_all_opportunities [x2]
+  23.113s  get_narrative_analysis [x13]
+  23.113s  compute_all_metrics [x8]
+  23.198s  get_sentiment_trends [x5]
+  25.787s  compute_all_metrics [x8]
+  25.832s  get_source_quality_report [x3]
+  25.857s  generate_gnei_intelligence
+  25.857s  get_narrative_analysis [x13]
+  25.857s  compute_all_metrics [x8]
+  25.900s  get_source_quality_report [x3]
+  25.914s  record_recommendation [x7]
+  25.933s  score_all_narratives
+  26.120s  run_intelligence_learning_cycle
+  26.564s  get_top_opportunities
+  26.579s  get_top_stakeholders
+  33.916s  get_top_influence_stakeholders
+  33.916s  _get_top_influence_from_materialised
+  33.992s  get_emerging_stakeholders
+  33.999s  generate_opportunity_dossier [x5]
+  34.024s  get_narrative_analysis [x13]
+  34.279s  generate_opportunity_dossier [x5]
+  34.290s  get_narrative_analysis [x13]
+  34.309s  generate_opportunity_dossier [x5]
+  34.319s  get_narrative_analysis [x13]
+  34.339s  generate_opportunity_dossier [x5]
+  34.348s  get_narrative_analysis [x13]
+  34.367s  generate_opportunity_dossier [x5]
+  34.377s  get_narrative_analysis [x13]
+  34.517s  record_recommendation [x7]
+  34.525s  record_recommendation [x7]
+  34.531s  record_recommendation [x7]
+  34.537s  record_recommendation [x7]
+
+======================================================================
+  SITUATION ROOM — CALL ORDER AND TIMING (cold cache)
+  Total: 11.59s
+======================================================================
+   0.000s  generate_situation_room
+   0.000s  compute_all_metrics
+   0.070s  get_sentiment_trends
+   2.573s  get_narrative_analysis
+   2.573s  _get_narrative_analysis_from_materialised
+   2.582s  get_top_entities
+   2.633s  get_emerging_topics
+  11.580s  record_recommendation [x2]
+  11.587s  record_recommendation [x2]
+
+======================================================================
+  SOI DASHBOARD — CALL ORDER AND TIMING (cold cache)
+  Total: 59.87s
+======================================================================
+   0.001s  generate_opportunity_assessments
+  51.359s  get_top_opportunities
+  51.374s  get_top_stakeholders
+  58.940s  run_intelligence_learning_cycle
+  59.104s  generate_opportunity_dossier [x7]
+  59.117s  get_narrative_analysis [x7]
+  59.117s  _get_narrative_analysis_from_materialised
+  59.220s  generate_opportunity_dossier [x7]
+  59.231s  get_narrative_analysis [x7]
+  59.263s  generate_opportunity_dossier [x7]
+  59.279s  get_narrative_analysis [x7]
+  59.310s  generate_opportunity_dossier [x7]
+  59.326s  get_narrative_analysis [x7]
+  59.360s  generate_opportunity_dossier [x7]
+  59.381s  get_narrative_analysis [x7]
+  59.632s  generate_opportunity_dossier [x7]
+  59.646s  get_narrative_analysis [x7]
+  59.743s  generate_opportunity_dossier [x7]
+  59.752s  get_narrative_analysis [x7]
+
+Done.

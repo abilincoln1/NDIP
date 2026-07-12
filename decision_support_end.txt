@@ -1,0 +1,27 @@
+        posture_summary = "No urgent conditions. Routine monitoring mode."
+
+    result = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "period_days": days,
+        "overall_posture": overall_posture,
+        "posture_summary": posture_summary,
+        "decision_support_summary": summary_bullets,
+        "immediate_actions": immediate,
+        "near_term_actions": near_term,
+        "strategic_actions": strategic,
+        "monitoring_actions": monitoring,
+        "total_actions": len(immediate) + len(near_term) + len(strategic) + len(monitoring),
+        "immediate_count": len(immediate),
+        "near_term_count": len(near_term),
+        "safeguard_note": SAFEGUARD_NOTE,
+        "action_categories": ACTION_CATEGORIES,
+    }
+
+    # V5.6: enrich every action with explicit time_horizon + confidence fields,
+    # then persist to the Recommendation Effectiveness Tracker for later evaluation.
+    _enrich_and_track_recommendations(db, result, days)
+
+    return result
+
+
+def _enrich_and_track_recommendations(db: Session, result: dict, days: int) -> None:

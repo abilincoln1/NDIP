@@ -1,0 +1,58 @@
+38:@router.get("/registry/stakeholders")
+39:def list_stakeholders(
+66:def add_stakeholder(
+92:@router.get("/registry/opportunities")
+93:def list_opportunity_types(
+119:def add_opportunity_type(
+139:@router.get("/stakeholders/top")
+140:def get_top_stakeholders_route(
+150:@router.get("/stakeholders/{stakeholder_id}/profile")
+151:def get_stakeholder_profile(
+198:@router.get("/opportunities")
+199:def list_opportunities(
+233:@router.get("/opportunities/{opportunity_id}")
+234:def get_opportunity_detail(
+271:def advance_opportunity(
+298:def trigger_opportunity_generation(
+314:@router.get("/opportunities/pipeline/summary")
+315:def pipeline_summary(
+324:def log_outcome_chain_link(
+361:@router.get("/outcome-chain/{recommendation_id}")
+362:def get_outcome_chain(
+384:@router.get("/dashboard")
+385:def strategic_outcome_dashboard(
+437:@router.get("/v61/stakeholders/influence/top")
+438:def get_top_stakeholder_influence(
+448:@router.get("/v61/stakeholders/{stakeholder_id}/influence")
+449:def get_stakeholder_influence_detail(
+464:@router.get("/v61/stakeholders/{stakeholder_id}/relationships")
+465:def get_relationships(
+474:@router.get("/v61/stakeholders/{stakeholder_id}/dependency-chain")
+475:def get_dependency_chain(
+484:@router.get("/v61/network/graph")
+485:def get_network_graph_route(
+495:def add_relationship(
+517:@router.get("/v61/relationships")
+518:def list_relationships(
+536:def delete_relationship(
+552:@router.get("/v61/opportunities/{opportunity_id}/alignment")
+553:def get_opportunity_alignment(
+564:@router.get("/v61/opportunities/{opportunity_id}/readiness")
+565:def get_opportunity_readiness_route(
+579:@router.get("/v61/opportunities/{opportunity_id}/pathway")
+580:def get_pathway(
+596:def complete_pathway_step(
+614:@router.get("/v61/opportunities/{opportunity_id}/execution-plan")
+615:def get_execution_plan(
+627:@router.get("/v611/opportunities/{opportunity_id}/dossier")
+628:def get_opportunity_dossier(
+643:@router.get("/v61/stakeholders/{stakeholder_id}/momentum")
+644:def get_momentum(
+656:@router.get("/v61/waste-energy-climate")
+657:def get_waste_energy_climate(
+668:@router.get("/v61/learning/stakeholder-effectiveness")
+669:def get_stakeholder_effectiveness(
+680:def update_stakeholder(
+699:def deactivate_stakeholder(
+714:def update_opportunity_type(
+733:def deactivate_opportunity_type(

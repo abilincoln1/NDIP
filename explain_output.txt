@@ -1,0 +1,133 @@
+
+======================================================================
+  QUERY: NormalisedPost -- current period scan (narrative analysis)
+======================================================================
+  FAILED: ProgrammingError: (psycopg2.errors.UndefinedColumn) column "narrative_category" does not exist
+LINE 1: ...) SELECT id, text, published_at, source_platform, narrative_...
+                                                             ^
+
+[SQL: EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT) SELECT id, text, published_at, source_platform, narrative_category, sentiment_score
+       FROM normalised_posts
+       WHERE published_at >= %(since)s
+         AND nlp_processed = true
+         AND text IS NOT NULL]
+[parameters: {'since': datetime.datetime(2026, 5, 31, 20, 6, 35, 518861, tzinfo=datetime.timezone.utc)}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+======================================================================
+  QUERY: NormalisedPost -- previous period scan (momentum calculation)
+======================================================================
+  FAILED: ProgrammingError: (psycopg2.errors.UndefinedColumn) column "narrative_category" does not exist
+LINE 1: ...) SELECT id, text, published_at, source_platform, narrative_...
+                                                             ^
+
+[SQL: EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT) SELECT id, text, published_at, source_platform, narrative_category, sentiment_score
+       FROM normalised_posts
+       WHERE published_at >= %(prev_since)s
+         AND published_at < %(since)s
+         AND nlp_processed = true
+         AND text IS NOT NULL]
+[parameters: {'prev_since': datetime.datetime(2026, 5, 1, 20, 6, 35, 518861, tzinfo=datetime.timezone.utc), 'since': datetime.datetime(2026, 5, 31, 20, 6, 35, 518861, tzinfo=datetime.timezone.utc)}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+======================================================================
+  QUERY: StakeholderRegistry -- active stakeholders with aliases
+======================================================================
+Seq Scan on stakeholder_registry  (cost=0.00..4.35 rows=68 width=825) (actual time=0.927..0.981 rows=69 loops=1)
+  Filter: is_active
+  Buffers: shared hit=3
+Planning:
+  Buffers: shared hit=128
+Planning Time: 14.577 ms
+Execution Time: 1.466 ms
+
+======================================================================
+  QUERY: OpportunityAlignmentScore -- all rows for opportunity 5
+======================================================================
+Sort  (cost=46.55..47.51 rows=386 width=76) (actual time=12.657..12.700 rows=371 loops=1)
+  Sort Key: id DESC
+  Sort Method: quicksort  Memory: 63kB
+  Buffers: shared hit=18 dirtied=2
+  ->  Bitmap Heap Scan on opportunity_alignment_scores  (cost=7.14..29.97 rows=386 width=76) (actual time=1.743..10.636 rows=371 loops=1)
+        Recheck Cond: (opportunity_id = 5)
+        Heap Blocks: exact=14
+        Buffers: shared hit=15 dirtied=2
+        ->  Bitmap Index Scan on ix_opportunity_alignment_scores_opportunity_id  (cost=0.00..7.04 rows=386 width=0) (actual time=1.081..1.083 rows=371 loops=1)
+              Index Cond: (opportunity_id = 5)
+              Buffers: shared hit=1
+Planning:
+  Buffers: shared hit=135 dirtied=3
+Planning Time: 18.873 ms
+Execution Time: 13.535 ms
+
+======================================================================
+  QUERY: OpportunityAlignmentScore -- latest per stakeholder (should be indexed)
+======================================================================
+Unique  (cost=46.55..48.48 rows=15 width=76) (actual time=0.713..0.815 rows=7 loops=1)
+  Buffers: shared hit=15
+  ->  Sort  (cost=46.55..47.51 rows=386 width=76) (actual time=0.711..0.747 rows=371 loops=1)
+        Sort Key: stakeholder_id, id DESC
+        Sort Method: quicksort  Memory: 63kB
+        Buffers: shared hit=15
+        ->  Bitmap Heap Scan on opportunity_alignment_scores  (cost=7.14..29.97 rows=386 width=76) (actual time=0.069..0.152 rows=371 loops=1)
+              Recheck Cond: (opportunity_id = 5)
+              Heap Blocks: exact=14
+              Buffers: shared hit=15
+              ->  Bitmap Index Scan on ix_opportunity_alignment_scores_opportunity_id  (cost=0.00..7.04 rows=386 width=0) (actual time=0.058..0.059 rows=371 loops=1)
+                    Index Cond: (opportunity_id = 5)
+                    Buffers: shared hit=1
+Planning:
+  Buffers: shared hit=4
+Planning Time: 1.206 ms
+Execution Time: 1.625 ms
+
+======================================================================
+  QUERY: RecommendationRecord -- dedup guard query
+======================================================================
+Limit  (cost=8.31..8.32 rows=1 width=12) (actual time=1.797..1.799 rows=1 loops=1)
+  Buffers: shared hit=7
+  ->  Sort  (cost=8.31..8.32 rows=1 width=12) (actual time=1.796..1.796 rows=1 loops=1)
+        Sort Key: created_at DESC
+        Sort Method: quicksort  Memory: 25kB
+        Buffers: shared hit=7
+        ->  Index Scan using ix_recommendation_narrative_created on recommendation_records  (cost=0.27..8.30 rows=1 width=12) (actual time=1.661..1.729 rows=2 loops=1)
+              Index Cond: ((narrative IS NULL) AND (created_at >= '2026-06-29 20:06:35.518861+00'::timestamp with time zone))
+              Filter: (((module)::text = 'decision_support'::text) AND ((recommendation_category)::text = 'ENGAGE'::text) AND ((status)::text = 'OPEN'::text))
+              Rows Removed by Filter: 8
+              Buffers: shared hit=4
+Planning:
+  Buffers: shared hit=166
+Planning Time: 18.349 ms
+Execution Time: 1.885 ms
+
+======================================================================
+  QUERY: EntityMention -- top entities for period
+======================================================================
+  FAILED: ProgrammingError: (psycopg2.errors.UndefinedTable) relation "entity_mentions" does not exist
+LINE 2:        FROM entity_mentions
+                    ^
+
+[SQL: EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT) SELECT entity_name, entity_type, COUNT(*) as mention_count
+       FROM entity_mentions
+       WHERE mentioned_at >= %(since)s
+       GROUP BY entity_name, entity_type
+       ORDER BY mention_count DESC
+       LIMIT 10]
+[parameters: {'since': datetime.datetime(2026, 5, 31, 20, 6, 35, 518861, tzinfo=datetime.timezone.utc)}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+======================================================================
+  QUERY: StakeholderRelationship -- active relationships for stakeholder
+======================================================================
+Seq Scan on stakeholder_relationships  (cost=0.00..14.20 rows=1 width=263) (actual time=0.221..0.227 rows=8 loops=1)
+  Filter: (is_active AND ((from_stakeholder_id = 18) OR (to_stakeholder_id = 18)))
+  Rows Removed by Filter: 38
+  Buffers: shared hit=1
+Planning:
+  Buffers: shared hit=127
+Planning Time: 9.512 ms
+Execution Time: 0.242 ms
+
+======================================================================
+  EXPLAIN ANALYZE COMPLETE
+======================================================================

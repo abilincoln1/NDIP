@@ -1,0 +1,80 @@
+Real table names in public schema:
+  admin_users
+  analytics_snapshots
+  connector_health_logs
+  engagement_pathways
+  engagement_steps
+  engagements
+  event_attendance
+  events
+  ingestion_jobs
+  named_entities
+  narrative_trends
+  normalised_posts
+  opportunity_alignment_scores
+  opportunity_assessments
+  opportunity_pipeline_events
+  opportunity_readiness_assessments
+  opportunity_registry
+  outcome_chain_links
+  participants
+  recommendation_records
+  reports
+  sentiment_records
+  social_metrics
+  social_posts
+  stakeholder_engagements
+  stakeholder_influence_profiles
+  stakeholder_momentum_snapshots
+  stakeholder_profiles
+  stakeholder_registry
+  stakeholder_relationships
+  stakeholder_watchlist
+  surveys
+  topics
+
+======================================================================
+  QUERY: NormalisedPost -- current period full scan (narrative analysis core)
+======================================================================
+  FAILED: ProgrammingError: (psycopg2.errors.UndefinedColumn) column "narrative_category" does not exist
+LINE 1: ...ORMAT TEXT) SELECT published_at, source_platform, narrative_...
+                                                             ^
+
+[SQL: EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT) SELECT published_at, source_platform, narrative_category, sentiment_score, text
+       FROM normalised_posts
+       WHERE published_at >= %(since)s
+         AND nlp_processed = true
+         AND text IS NOT NULL]
+[parameters: {'since': datetime.datetime(2026, 5, 31, 20, 10, 34, 773020, tzinfo=datetime.timezone.utc)}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+======================================================================
+  QUERY: NormalisedPost -- previous period scan (momentum)
+======================================================================
+  FAILED: ProgrammingError: (psycopg2.errors.UndefinedColumn) column "narrative_category" does not exist
+LINE 1: ...ORMAT TEXT) SELECT published_at, source_platform, narrative_...
+                                                             ^
+
+[SQL: EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT) SELECT published_at, source_platform, narrative_category, sentiment_score, text
+       FROM normalised_posts
+       WHERE published_at >= %(prev_since)s
+         AND published_at < %(since)s
+         AND nlp_processed = true
+         AND text IS NOT NULL]
+[parameters: {'prev_since': datetime.datetime(2026, 5, 1, 20, 10, 34, 773020, tzinfo=datetime.timezone.utc), 'since': datetime.datetime(2026, 5, 31, 20, 10, 34, 773020, tzinfo=datetime.timezone.utc)}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+======================================================================
+  QUERY: NormalisedPost -- count by table (size check)
+======================================================================
+Aggregate  (cost=909.27..909.28 rows=1 width=8) (actual time=305.814..305.815 rows=1 loops=1)
+  Buffers: shared hit=630 read=2
+  ->  Index Only Scan using ix_normalised_posts_nlp_processed on normalised_posts  (cost=0.29..874.56 rows=13885 width=0) (actual time=3.657..303.333 rows=13870 loops=1)
+        Heap Fetches: 5014
+        Buffers: shared hit=630 read=2
+Planning:
+  Buffers: shared hit=240
+Planning Time: 32.824 ms
+Execution Time: 306.619 ms
+
+Done.
