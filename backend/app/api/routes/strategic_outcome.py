@@ -482,8 +482,8 @@ def get_top_stakeholder_influence(
     db: Session = Depends(get_db),
     _: dict = Depends(get_current_user),
 ):
-    from app.services.stakeholder_influence import get_top_influence_stakeholders
-    return {"stakeholders": get_top_influence_stakeholders(db, limit=limit, days=days)}
+    from app.services.materialised_reads import get_materialised_top_influence_stakeholders
+    return {"stakeholders": get_materialised_top_influence_stakeholders(db, limit=limit, days=days)}
 
 
 @router.get("/v61/stakeholders/{stakeholder_id}/influence")

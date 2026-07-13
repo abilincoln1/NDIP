@@ -38,9 +38,10 @@ def situation_room(
     # V6.0A/V6.1.1 services; introduces no new computation engine.
     try:
         from app.services.stakeholder_registry import get_top_stakeholders
-        from app.services.stakeholder_influence import get_top_influence_stakeholders, get_emerging_stakeholders
+        from app.services.materialised_reads import get_materialised_top_influence_stakeholders
+        from app.services.stakeholder_influence import get_emerging_stakeholders
         base["priority_stakeholders"] = get_top_stakeholders(db, limit=8, days=min(days, 30))
-        _influence_ranked = get_top_influence_stakeholders(db, limit=50, days=min(days, 30))
+        _influence_ranked = get_materialised_top_influence_stakeholders(db, limit=50, days=min(days, 30))
         base["emerging_decision_makers"] = [
             s for s in get_emerging_stakeholders(db, limit=10, days=min(days, 30), _precomputed_ranked=_influence_ranked)
             if s.get("stakeholder_type") is not None

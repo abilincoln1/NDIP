@@ -18,6 +18,8 @@ from app.analytics.engine import compute_all_metrics
 from app.services.source_quality import get_source_quality_report, get_data_quality_report
 from app.services.risk_opportunity import detect_all_risks, detect_all_opportunities
 from app.services.narrative_intelligence import generate_situation_room
+from app.services.materialised_reads import get_materialised_top_influence_stakeholders
+from app.services.stakeholder_influence import get_emerging_stakeholders
 
 router = APIRouter(prefix="/leadership-pack", tags=["leadership-pack"])
 
@@ -170,8 +172,7 @@ def leadership_pack(
     # is a different module, so a failure here should not affect the V6.0
     # fields that already work.
     try:
-        from app.services.stakeholder_influence import get_top_influence_stakeholders, get_emerging_stakeholders
-        _influence_ranked = get_top_influence_stakeholders(db, limit=50, days=min(days, 30))
+        _influence_ranked = get_materialised_top_influence_stakeholders(db, limit=50, days=min(days, 30))
         result["stakeholder_influence_summary"] = _influence_ranked[:8]
         result["emerging_stakeholders"] = get_emerging_stakeholders(db, limit=5, days=min(days, 30), _precomputed_ranked=_influence_ranked)
     except Exception:
