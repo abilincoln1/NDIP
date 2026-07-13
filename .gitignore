@@ -34,3 +34,5 @@ Thumbs.db
 *.tmp
 *.bak
 *.swp
+*.bak_*
+*.pre_import_fix
