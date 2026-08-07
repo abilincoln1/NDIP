@@ -1,0 +1,94 @@
+{
+  "run_at": "2026-08-03T14:51:24.253235+00:00",
+  "overall": "PASS",
+  "fail_count": 0,
+  "warn_count": 0,
+  "note": "This is the clean T+0 baseline, run immediately after fixing DEFECT-001 (AuditLogMiddleware silent failure). A second run performed seconds later (same script invocation, back-to-back) hit the strict 10/min rate limit on /api/v2/members/login by design (14 login attempts within ~15s from the same container IP) — that run's 429s are expected rate-limiter behavior, not a defect, and are recorded separately.",
+  "results": [
+    {
+      "check": "GET /health",
+      "status": "PASS",
+      "detail": "status_code=200"
+    },
+    {
+      "check": "GET /readiness",
+      "status": "PASS",
+      "detail": "status_code=200, body={'status': 'ready', 'checks': {'database': 'ok', 'redis': 'ok'}}"
+    },
+    {
+      "check": "Login: super_admin",
+      "status": "PASS",
+      "detail": "email=superadmin@ndip.rtifn.org, status_code=200"
+    },
+    {
+      "check": "Login: national_director",
+      "status": "PASS",
+      "detail": "email=nationaldirector@ndip.rtifn.org, status_code=200"
+    },
+    {
+      "check": "Login: chapter_admin",
+      "status": "PASS",
+      "detail": "email=chapteradmin.bham@ndip.rtifn.org, status_code=200"
+    },
+    {
+      "check": "Login: verifier",
+      "status": "PASS",
+      "detail": "email=verifier@ndip.rtifn.org, status_code=200"
+    },
+    {
+      "check": "Login: intelligence_analyst",
+      "status": "PASS",
+      "detail": "email=analyst@ndip.rtifn.org, status_code=200"
+    },
+    {
+      "check": "Login: verified_member",
+      "status": "PASS",
+      "detail": "email=verifiedmember@ndip.rtifn.org, status_code=200"
+    },
+    {
+      "check": "Login: standard_member",
+      "status": "PASS",
+      "detail": "email=member@ndip.rtifn.org, status_code=200"
+    },
+    {
+      "check": "RBAC denies standard_member on /admin/platform-stats",
+      "status": "PASS",
+      "detail": "status_code=403 (expected 403)"
+    },
+    {
+      "check": "RBAC allows super_admin on /admin/platform-stats",
+      "status": "PASS",
+      "detail": "status_code=200"
+    },
+    {
+      "check": "Audit log is capturing requests",
+      "status": "PASS",
+      "detail": "total_audit_rows=12 (this run's own requests should already be logged) — confirms DEFECT-001 fix is durable, not a one-off"
+    },
+    {
+      "check": "Scheduler job log has entries",
+      "status": "PASS",
+      "detail": "28 log rows found, job_names_seen=['duplicate_detection', 'nlp_extraction', 'notification_retry', 'verification_queue']. Hourly jobs fire ~60min after scheduler start, nightly jobs at 02:00-02:45 UTC — it is normal for not all 8 jobs to have run yet this early in Stage 1."
+    },
+    {
+      "check": "No failed scheduler jobs in recent log",
+      "status": "PASS",
+      "detail": "0 failed job runs out of 28 recent entries"
+    },
+    {
+      "check": "Notifications still on DevNull (no real delivery) — expected for Stage 1",
+      "status": "PASS",
+      "detail": "SMTP_HOST unset, DevNullEmailProvider active — correct for Stage 1 (test accounts only, no real invitations)"
+    },
+    {
+      "check": "No failed notifications recorded",
+      "status": "PASS",
+      "detail": "failed_notifications=0"
+    },
+    {
+      "check": "Light repeated load handled cleanly (5x GET /geography/states)",
+      "status": "PASS",
+      "detail": "status_codes=[200, 200, 200, 200, 200]"
+    }
+  ]
+}

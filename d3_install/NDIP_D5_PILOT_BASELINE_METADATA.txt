@@ -1,0 +1,10 @@
+ table_name | count 
+------------+-------
+ members    |    17
+ chapters   |     1
+ ng_states  |    37
+ ng_lgas    |   774
+ audit_log  |     1
+(5 rows)
+
+File size: 9228614 bytes 

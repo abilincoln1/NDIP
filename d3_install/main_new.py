@@ -107,12 +107,3 @@ def root():
 @app.get("/health", tags=["health"])
 def health():
     return {"status": "ok"}
-
-
-# ── D5A Platform Kernel v3 Routes ──────────────────────────────────────────────
-from app.api.routes.auth_v3 import router as auth_v3_router
-from app.api.routes.tenants_v3 import router as tenants_v3_router
-
-# D5A v3 routes — Platform Kernel
-app.include_router(auth_v3_router)
-app.include_router(tenants_v3_router)

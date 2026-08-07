@@ -1,0 +1,425 @@
+{
+  "summary": {
+    "total": 99,
+    "passed": 97,
+    "failed": 2,
+    "pass_rate": 97
+  },
+  "verdict": "FAIL",
+  "performance_ms": {
+    "Login": 722,
+    "Member list": 71,
+    "Platform stats": 36,
+    "Geography states": 17,
+    "Leaderboard": 25,
+    "Reports list": 23
+  },
+  "defects": [
+    {
+      "id": "D4-001",
+      "area": "AUTH",
+      "test": "Rate limiting fires",
+      "severity": "High",
+      "detail": "429 seen: False, after 15 requests",
+      "status": "OPEN"
+    }
+  ],
+  "results": {
+    "AUTH::Login: super_admin": {
+      "status": "PASS",
+      "detail": "783ms"
+    },
+    "AUTH::Login: national_director": {
+      "status": "PASS",
+      "detail": "666ms"
+    },
+    "AUTH::Login: chapter_admin": {
+      "status": "PASS",
+      "detail": "868ms"
+    },
+    "AUTH::Login: verifier": {
+      "status": "PASS",
+      "detail": "689ms"
+    },
+    "AUTH::Login: intelligence_analyst": {
+      "status": "PASS",
+      "detail": "814ms"
+    },
+    "AUTH::Login: verified_member": {
+      "status": "PASS",
+      "detail": "920ms"
+    },
+    "AUTH::Login: standard_member": {
+      "status": "PASS",
+      "detail": "709ms"
+    },
+    "AUTH::All 7 roles logged in": {
+      "status": "PASS",
+      "detail": "7 of 7"
+    },
+    "AUTH::Invalid password rejected (401)": {
+      "status": "PASS",
+      "detail": "HTTP 401"
+    },
+    "AUTH::Unknown email rejected (401)": {
+      "status": "PASS",
+      "detail": "HTTP 401"
+    },
+    "AUTH::Refresh token rotation": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "AUTH::Used refresh token replay rejected": {
+      "status": "PASS",
+      "detail": "HTTP 401"
+    },
+    "AUTH::Invalid JWT rejected (401)": {
+      "status": "PASS",
+      "detail": "HTTP 401"
+    },
+    "AUTH::Logout everywhere": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "AUTH::Password reset always 200 (anti-enumeration)": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "AUTH::Rate limiting fires": {
+      "status": "FAIL",
+      "detail": "429 seen: False, after 15 requests"
+    },
+    "AUTH::GET /health": {
+      "status": "PASS",
+      "detail": "status=ok"
+    },
+    "AUTH::GET /readiness": {
+      "status": "PASS",
+      "detail": "status=ready, checks={'database': 'ok', 'redis': 'ok'}"
+    },
+    "RBAC::/me: super_admin": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "RBAC::/me: national_director": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "RBAC::/me: chapter_admin": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "RBAC::/me: verifier": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "RBAC::/me: intelligence_analyst": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "RBAC::/me: verified_member": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "RBAC::/me: standard_member": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "RBAC::Admin blocked: standard_member": {
+      "status": "PASS",
+      "detail": "HTTP 403"
+    },
+    "RBAC::Admin blocked: verified_member": {
+      "status": "PASS",
+      "detail": "HTTP 403"
+    },
+    "RBAC::Admin blocked: verifier": {
+      "status": "PASS",
+      "detail": "HTTP 403"
+    },
+    "RBAC::Admin blocked: intelligence_analyst": {
+      "status": "PASS",
+      "detail": "HTTP 403"
+    },
+    "RBAC::Admin accessible: super_admin": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "RBAC::Admin accessible: national_director": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "RBAC::Admin accessible: chapter_admin": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "RBAC::Audit log blocked: standard_member": {
+      "status": "PASS",
+      "detail": "HTTP 403"
+    },
+    "RBAC::Audit log blocked: chapter_admin": {
+      "status": "PASS",
+      "detail": "HTTP 403"
+    },
+    "RBAC::Audit log: national_director": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "RBAC::Audit log: intelligence_analyst": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "RBAC::Privilege escalation blocked (chapter_admin -> super_admin)": {
+      "status": "PASS",
+      "detail": "HTTP 403"
+    },
+    "RBAC::Geography public (no auth)": {
+      "status": "PASS",
+      "detail": "HTTP 200, 37 states"
+    },
+    "RBAC::Unauthenticated /me blocked": {
+      "status": "PASS",
+      "detail": "HTTP 403"
+    },
+    "RBAC::Verifier queue: verifier role": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "RBAC::Verifier queue blocked: standard_member": {
+      "status": "PASS",
+      "detail": "HTTP 403"
+    },
+    "MEMBERS::List paginated": {
+      "status": "PASS",
+      "detail": "total=17, page_size=5"
+    },
+    "MEMBERS::Filter by role": {
+      "status": "PASS",
+      "detail": "count=1"
+    },
+    "MEMBERS::Search": {
+      "status": "PASS",
+      "detail": "results=2"
+    },
+    "MEMBERS::Filter verified=true": {
+      "status": "PASS",
+      "detail": "count=7"
+    },
+    "MEMBERS::Own profile readable": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "MEMBERS::Own profile update": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "ONBOARDING::Get wizard state": {
+      "status": "PASS",
+      "detail": "completion=44%"
+    },
+    "ONBOARDING::Advance step: state_selected": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "ONBOARDING::Advance step: chapter_confirmed": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "ONBOARDING::Advance step: terms_accepted": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "ONBOARDING::Invalid step rejected (400)": {
+      "status": "PASS",
+      "detail": "HTTP 400"
+    },
+    "ONBOARDING::States: 37 returned": {
+      "status": "PASS",
+      "detail": "count=37"
+    },
+    "ONBOARDING::LGAs for Lagos (20)": {
+      "status": "PASS",
+      "detail": "count=20"
+    },
+    "ONBOARDING::Invalid state 404": {
+      "status": "PASS",
+      "detail": "HTTP 404"
+    },
+    "ONBOARDING::Geography search": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "REPORTS::Create (201)": {
+      "status": "PASS",
+      "detail": "HTTP 201"
+    },
+    "REPORTS::List own reports": {
+      "status": "PASS",
+      "detail": "total=7"
+    },
+    "REPORTS::Get single": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "REPORTS::Update draft": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "REPORTS::Submit": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "REPORTS::Edit submitted blocked (409)": {
+      "status": "PASS",
+      "detail": "HTTP 409"
+    },
+    "REPORTS::Admin list submitted": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "REPORTS::Admin approve": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "SPONSORSHIPS::Create (201)": {
+      "status": "PASS",
+      "detail": "HTTP 201"
+    },
+    "SPONSORSHIPS::List": {
+      "status": "PASS",
+      "detail": "total=7"
+    },
+    "SPONSORSHIPS::Get single": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "PROJECTS::Create (201)": {
+      "status": "PASS",
+      "detail": "HTTP 201"
+    },
+    "PROJECTS::List": {
+      "status": "PASS",
+      "detail": "total=7"
+    },
+    "PROJECTS::Get with stakeholders": {
+      "status": "PASS",
+      "detail": "stakeholders=1"
+    },
+    "PROJECTS::Update status": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "VERIFICATION::Submit (201)": {
+      "status": "PASS",
+      "detail": "HTTP 201"
+    },
+    "VERIFICATION::Own submissions": {
+      "status": "PASS",
+      "detail": "total=7"
+    },
+    "VERIFICATION::Queue": {
+      "status": "PASS",
+      "detail": "total=0"
+    },
+    "VERIFICATION::Approve submission": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "DASHBOARD::Member dashboard": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "DASHBOARD::Impact score": {
+      "status": "PASS",
+      "detail": "score=0"
+    },
+    "DASHBOARD::Leaderboard": {
+      "status": "PASS",
+      "detail": "total=0"
+    },
+    "DASHBOARD::Admin platform stats": {
+      "status": "PASS",
+      "detail": "keys=['total_members', 'active_members', 'verified_members', 'total_chapters', 'approved_reports']"
+    },
+    "DASHBOARD::Chapter summaries": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "DASHBOARD::Scheduler log": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "SCHEDULER::Audit log has entries": {
+      "status": "PASS",
+      "detail": "897 entries"
+    },
+    "SCHEDULER::Scheduler log accessible": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "SCHEDULER::Impact scores populated": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "SCHEDULER::Notifications table operational": {
+      "status": "PASS",
+      "detail": "failed_notifications=0"
+    },
+    "OBS::X-Request-ID present": {
+      "status": "PASS",
+      "detail": "present"
+    },
+    "OBS::X-Response-Time-Ms present": {
+      "status": "PASS",
+      "detail": "present"
+    },
+    "OBS::/health returns ok": {
+      "status": "PASS",
+      "detail": "status=ok"
+    },
+    "OBS::/readiness ready": {
+      "status": "PASS",
+      "detail": "status=ready, checks={'database': 'ok', 'redis': 'ok'}"
+    },
+    "OBS::/api/v2/metrics": {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    "PERF::All endpoints < 2000ms": {
+      "status": "PASS",
+      "detail": "All within threshold"
+    },
+    "SECURITY::SQL injection rejected": {
+      "status": "PASS",
+      "detail": "HTTP 422"
+    },
+    "SECURITY::SQL comment injection rejected": {
+      "status": "PASS",
+      "detail": "HTTP 422"
+    },
+    "SECURITY::XSS payload stored safely (JSON API)": {
+      "status": "PASS",
+      "detail": "JSON API returns raw text - no HTML execution at API layer"
+    },
+    "SECURITY::JWT role tampering rejected": {
+      "status": "PASS",
+      "detail": "HTTP 401"
+    },
+    "SECURITY::CORS headers on OPTIONS": {
+      "status": "FAIL",
+      "detail": "origin=not set"
+    },
+    "SECURITY::INVITED member login blocked": {
+      "status": "PASS",
+      "detail": "HTTP 401"
+    },
+    "SECURITY::Malformed token rejected": {
+      "status": "PASS",
+      "detail": "HTTP 401"
+    },
+    "SECURITY::Wrong auth scheme rejected": {
+      "status": "PASS",
+      "detail": "HTTP 403"
+    }
+  }
+}

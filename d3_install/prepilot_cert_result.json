@@ -1,0 +1,78 @@
+{
+  "run_at": "2026-08-03T14:04:28.857285+00:00",
+  "overall": "CERTIFIED",
+  "fail_count": 0,
+  "warn_count": 4,
+  "results": [
+    {
+      "check": "SECRET_KEY strength",
+      "status": "PASS",
+      "detail": "length=64 chars, is_default=False"
+    },
+    {
+      "check": "APP_ENV is production",
+      "status": "WARN",
+      "detail": "app_env='development' (expected 'production' before external pilot traffic)"
+    },
+    {
+      "check": "JWT algorithm is HS256",
+      "status": "PASS",
+      "detail": "algorithm='HS256'"
+    },
+    {
+      "check": "Access token expiry <= 24h",
+      "status": "PASS",
+      "detail": "access_token_expire_minutes=1440"
+    },
+    {
+      "check": "CORS restricted to localhost (dev pilot)",
+      "status": "PASS",
+      "detail": "cors_origins=['http://localhost:3000']. OK for internal/Stage-1-2 pilot; MUST be updated to production domain before public/national rollout."
+    },
+    {
+      "check": "Rate limits match production values",
+      "status": "PASS",
+      "detail": "RATE_LIMITS={'strict': (10, 60), 'unauthenticated': (20, 60), 'authenticated': (60, 60)}"
+    },
+    {
+      "check": "Bcrypt cost factor >= 12",
+      "status": "PASS",
+      "detail": "gensalt(rounds=12) produced cost=12"
+    },
+    {
+      "check": "Database reachable",
+      "status": "PASS",
+      "detail": "SELECT 1 succeeded"
+    },
+    {
+      "check": "Database has expected table count",
+      "status": "PASS",
+      "detail": "table_count=60 (baseline: 60)"
+    },
+    {
+      "check": "No active members missing an RBAC role",
+      "status": "PASS",
+      "detail": "active members with NULL role=0"
+    },
+    {
+      "check": "Cohort placeholder emails remaining",
+      "status": "WARN",
+      "detail": "3 member(s) still have placeholder invited.ndip.rtifn.org emails — must be resolved before those members can be invited/authenticate"
+    },
+    {
+      "check": "Redis reachable",
+      "status": "PASS",
+      "detail": "PING -> True"
+    },
+    {
+      "check": "SMTP configured for real delivery",
+      "status": "WARN",
+      "detail": "SMTP_HOST not set — DevNullEmailProvider active, invitation emails will NOT be delivered. Must configure before Stage 2/3 invitations go out."
+    },
+    {
+      "check": "All expected secret env vars present",
+      "status": "WARN",
+      "detail": "missing=['TWITTER_BEARER_TOKEN', 'REDDIT_CLIENT_SECRET', 'META_ACCESS_TOKEN']"
+    }
+  ]
+}

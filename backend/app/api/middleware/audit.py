@@ -5,14 +5,18 @@ Captures: user, endpoint, method, IP, response code, duration.
 Must be registered in main.py as:
     app.add_middleware(AuditLogMiddleware)
 """
+import logging
 import time
 import hashlib
 import json
+import traceback
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 from sqlalchemy import text
 from app.db.database import SessionLocal
+
+logger = logging.getLogger("ndip.audit")
 
 # Endpoints that do not need audit logging (health checks, static assets)
 SKIP_PATHS = {"/health", "/docs", "/openapi.json", "/redoc", "/favicon.ico"}
@@ -62,7 +66,7 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
                      ip_address, user_agent, payload_hash, response_code, duration_ms)
                 VALUES
                     (:user_email, :user_id, :action, :endpoint, :method,
-                     :ip_address::inet, :user_agent, :payload_hash, :response_code, :duration_ms)
+                     CAST(:ip_address AS inet), :user_agent, :payload_hash, :response_code, :duration_ms)
             """), {
                 "user_email": user_email,
                 "user_id": user_id,
@@ -78,7 +82,13 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
             db.commit()
             db.close()
         except Exception:
-            # Audit log failure must never break the API response
-            pass
+            # Audit log failure must never break the API response — but it
+            # must not fail silently either. A bare `except: pass` here is
+            # what let a broken INSERT (":ip_address::inet" not binding as
+            # a param — fixed 03 Aug 2026 by switching to CAST(:x AS inet))
+            # go undetected from ~02 Aug through Stage 1 kickoff, with only
+            # 1 row ever written to audit_log. Keep this as a real error log
+            # going forward so a future regression surfaces immediately.
+            logger.error("AuditLogMiddleware insert failed:\n%s", traceback.format_exc())
 
         return response
