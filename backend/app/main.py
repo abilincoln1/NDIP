@@ -116,3 +116,10 @@ from app.api.routes.tenants_v3 import router as tenants_v3_router
 # D5A v3 routes — Platform Kernel
 app.include_router(auth_v3_router)
 app.include_router(tenants_v3_router)
+
+# ── D5A-S4 Activity & Volunteer Engine ─────────────────────────────────────────
+from app.api.routes.activities_v3 import router as activities_v3_router
+from app.api.routes.volunteer_v3 import router as volunteer_v3_router
+
+app.include_router(activities_v3_router)
+app.include_router(volunteer_v3_router)

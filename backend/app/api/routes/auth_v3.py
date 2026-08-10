@@ -21,8 +21,6 @@ from app.core.config import get_settings
 
 router = APIRouter(prefix="/api/v3/auth", tags=["v3-auth"])
 
-RTIFN_TENANT_ID = "10000000-0000-0000-0000-000000000001"
-
 
 # ── DB dependency ──────────────────────────────────────────────────────────────
 
