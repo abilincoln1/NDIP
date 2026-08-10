@@ -105,9 +105,9 @@ STRICT_PATHS = {
 SKIP_PATHS = {"/health", "/readiness", "/docs", "/openapi.json", "/redoc"}
 
 RATE_LIMITS = {
-    "strict": (500, 60),
-    "unauthenticated": (500, 60),
-    "authenticated": (500, 60),
+    "strict": (10, 60),
+    "unauthenticated": (20, 60),
+    "authenticated": (60, 60),
 }
 
 
