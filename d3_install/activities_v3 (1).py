@@ -13,7 +13,6 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import date, datetime
 import uuid
-import json
 
 from app.db.database import SessionLocal
 from app.api.routes.auth_v3 import get_current_v3_identity, get_db
@@ -67,7 +66,6 @@ def can_admin(current: dict) -> bool:
 # ── Schemas ────────────────────────────────────────────────────────────────────
 
 class ActivityCreate(BaseModel):
-    project_id: Optional[str] = None
     activity_type: str          # name of activity type (e.g. 'ward_visit')
     title: str
     description: Optional[str] = None
@@ -219,14 +217,12 @@ def create_activity(
             title, description, activity_date, activity_details,
             location_country_id, location_state_id, location_lga_id, location_ward_id,
             gps_lat, gps_lng, location_text,
-            project_id,
             verification_status, created_at, updated_at
         ) VALUES (
             :id, :tenant_id, :recorded_by, :org_id, :type_id,
-            :title, :description, :activity_date, CAST(:details AS jsonb),
+            :title, :description, :activity_date, :details::jsonb,
             :country_id, :state_id, :lga_id, :ward_id,
             :gps_lat, :gps_lng, :location_text,
-            :project_id,
             'Draft', now(), now()
         )
     """), {
@@ -238,7 +234,7 @@ def create_activity(
         "title": payload.title,
         "description": payload.description,
         "activity_date": payload.activity_date,
-        "details": json.dumps(payload.activity_details or {}),
+        "details": str(payload.activity_details or {}),
         "country_id": country_id,
         "state_id": payload.location_state_id,
         "lga_id": payload.location_lga_id,
@@ -246,7 +242,6 @@ def create_activity(
         "gps_lat": payload.gps_lat,
         "gps_lng": payload.gps_lng,
         "location_text": payload.location_text,
-        "project_id": payload.project_id,
     })
     db.commit()
 
@@ -371,7 +366,7 @@ def update_activity(
         set_parts.append("activity_date = :activity_date")
     if payload.activity_details is not None:
         updates["details"] = str(payload.activity_details)
-        set_parts.append("activity_details = CAST(:details AS jsonb)")
+        set_parts.append("activity_details = :details::jsonb")
     if payload.location_state_id is not None:
         updates["state_id"] = payload.location_state_id
         set_parts.append("location_state_id = :state_id")

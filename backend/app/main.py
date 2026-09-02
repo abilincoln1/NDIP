@@ -123,3 +123,8 @@ from app.api.routes.volunteer_v3 import router as volunteer_v3_router
 
 app.include_router(activities_v3_router)
 app.include_router(volunteer_v3_router)
+
+# ── D5A-S5 Project Engine ────────────────────────────────────────────────────
+from app.api.routes.projects_v3 import router as projects_v3_router
+
+app.include_router(projects_v3_router)

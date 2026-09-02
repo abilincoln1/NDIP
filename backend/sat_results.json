@@ -1,18 +1,18 @@
 {
   "summary": {
     "total": 99,
-    "passed": 96,
-    "failed": 3,
-    "pass_rate": 96
+    "passed": 97,
+    "failed": 2,
+    "pass_rate": 97
   },
   "verdict": "FAIL",
   "performance_ms": {
-    "Login": 7031,
-    "Member list": 736,
-    "Platform stats": 701,
-    "Geography states": 314,
-    "Leaderboard": 310,
-    "Reports list": 210
+    "Login": 611,
+    "Member list": 36,
+    "Platform stats": 34,
+    "Geography states": 28,
+    "Leaderboard": 35,
+    "Reports list": 33
   },
   "defects": [
     {
@@ -22,44 +22,36 @@
       "severity": "High",
       "detail": "429 seen: False, after 15 requests",
       "status": "OPEN"
-    },
-    {
-      "id": "D4-002",
-      "area": "PERF",
-      "test": "All endpoints < 2000ms",
-      "severity": "Medium",
-      "detail": "Slow: {'Login': 7031}",
-      "status": "OPEN"
     }
   ],
   "results": {
     "AUTH::Login: super_admin": {
       "status": "PASS",
-      "detail": "3580ms"
+      "detail": "629ms"
     },
     "AUTH::Login: national_director": {
       "status": "PASS",
-      "detail": "10284ms"
+      "detail": "759ms"
     },
     "AUTH::Login: chapter_admin": {
       "status": "PASS",
-      "detail": "14977ms"
+      "detail": "640ms"
     },
     "AUTH::Login: verifier": {
       "status": "PASS",
-      "detail": "10522ms"
+      "detail": "637ms"
     },
     "AUTH::Login: intelligence_analyst": {
       "status": "PASS",
-      "detail": "1477ms"
+      "detail": "700ms"
     },
     "AUTH::Login: verified_member": {
       "status": "PASS",
-      "detail": "2659ms"
+      "detail": "642ms"
     },
     "AUTH::Login: standard_member": {
       "status": "PASS",
-      "detail": "2222ms"
+      "detail": "805ms"
     },
     "AUTH::All 7 roles logged in": {
       "status": "PASS",
@@ -263,7 +255,7 @@
     },
     "REPORTS::List own reports": {
       "status": "PASS",
-      "detail": "total=8"
+      "detail": "total=9"
     },
     "REPORTS::Get single": {
       "status": "PASS",
@@ -295,7 +287,7 @@
     },
     "SPONSORSHIPS::List": {
       "status": "PASS",
-      "detail": "total=8"
+      "detail": "total=9"
     },
     "SPONSORSHIPS::Get single": {
       "status": "PASS",
@@ -307,7 +299,7 @@
     },
     "PROJECTS::List": {
       "status": "PASS",
-      "detail": "total=8"
+      "detail": "total=9"
     },
     "PROJECTS::Get with stakeholders": {
       "status": "PASS",
@@ -323,7 +315,7 @@
     },
     "VERIFICATION::Own submissions": {
       "status": "PASS",
-      "detail": "total=8"
+      "detail": "total=9"
     },
     "VERIFICATION::Queue": {
       "status": "PASS",
@@ -339,11 +331,11 @@
     },
     "DASHBOARD::Impact score": {
       "status": "PASS",
-      "detail": "score=0"
+      "detail": "score=145.0"
     },
     "DASHBOARD::Leaderboard": {
       "status": "PASS",
-      "detail": "total=0"
+      "detail": "total=7"
     },
     "DASHBOARD::Admin platform stats": {
       "status": "PASS",
@@ -359,7 +351,7 @@
     },
     "SCHEDULER::Audit log has entries": {
       "status": "PASS",
-      "detail": "1082 entries"
+      "detail": "1383 entries"
     },
     "SCHEDULER::Scheduler log accessible": {
       "status": "PASS",
@@ -394,8 +386,8 @@
       "detail": "HTTP 200"
     },
     "PERF::All endpoints < 2000ms": {
-      "status": "FAIL",
-      "detail": "Slow: {'Login': 7031}"
+      "status": "PASS",
+      "detail": "All within threshold"
     },
     "SECURITY::SQL injection rejected": {
       "status": "PASS",
