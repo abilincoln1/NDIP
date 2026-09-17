@@ -128,3 +128,9 @@ app.include_router(volunteer_v3_router)
 from app.api.routes.projects_v3 import router as projects_v3_router
 
 app.include_router(projects_v3_router)
+
+# ── D5A-S6 Donations & Communications Engine ────────────────────────────────
+from app.api.routes.donations_comms_v3 import donations_router, comms_router
+
+app.include_router(donations_router)
+app.include_router(comms_router)
