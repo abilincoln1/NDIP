@@ -70,7 +70,7 @@ def normalise_unprocessed_batch(db: Session, limit: int = 500) -> int:
     """Find raw posts not yet in normalised_posts and normalise them."""
     normalised_ids = db.query(NormalisedPost.source_post_id).filter(
         NormalisedPost.source_post_id.isnot(None)
-    ).subquery()
+    ).scalar_subquery()
 
     raw_posts = db.query(SocialPost).filter(
         SocialPost.id.notin_(normalised_ids),

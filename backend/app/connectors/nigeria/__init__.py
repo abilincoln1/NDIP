@@ -38,6 +38,11 @@ class RSSConnector(BaseConnector):
     def _parse_rss(self, xml_text: str, query: str, max_results: int) -> list[RawPost]:
         posts = []
         try:
+            # SF-1: reject non-XML responses (e.g. HTML error pages)
+            if not xml_text or not xml_text.strip().startswith('<'):
+                raise ElementTree.ParseError(
+                    f"Non-XML response from feed: {repr(xml_text[:80] if xml_text else 'empty')}"
+                )
             root = ElementTree.fromstring(xml_text)
             ns = {"atom": "http://www.w3.org/2005/Atom"}
             items = root.findall(".//item") or root.findall(".//atom:entry", ns)
