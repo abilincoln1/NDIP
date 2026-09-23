@@ -56,6 +56,15 @@ const NAV_GROUPS = [
       { href: "/social",            label: "Source Monitor",       icon: Radio },
     ],
   },
+,
+  {
+    label: "OPERATIONAL",
+    items: [
+      { href: "/activities", label: "Activities", icon: Activity },
+      { href: "/volunteers", label: "Volunteers", icon: Users },
+      { href: "/projects",   label: "Projects",   icon: Cpu },
+    ],
+  },
   {
     label: "ANALYTICS",
     items: [
@@ -116,3 +125,4 @@ export default function Sidebar() {
     </aside>
   );
 }
+
