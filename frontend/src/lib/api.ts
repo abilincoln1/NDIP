@@ -8,7 +8,11 @@ const api = axios.create({
 // Attach JWT on every request
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
-    const token = localStorage.getItem("agora_token");
+    // Use v3 token for v3 routes, v2 token for everything else
+    const isV3 = config.url && config.url.startsWith("/api/v3/");
+    const token = isV3
+      ? (localStorage.getItem("agora_token_v3") || localStorage.getItem("agora_token"))
+      : localStorage.getItem("agora_token");
     if (token) config.headers.Authorization = `Bearer ${token}`;
   }
   return config;

@@ -101,8 +101,47 @@ def get_current_v3_identity(request: Request, db: Session = Depends(get_db)) -> 
         raise HTTPException(status_code=401, detail="Not authenticated")
     token = auth[7:]
     payload = _decode_v3_token(token)
+
+    # v2_compat: accept v2 member tokens by mapping member -> platform_identity
     if payload.get("v") != "3":
-        raise HTTPException(status_code=401, detail="Use v3 token for v3 routes")
+        # Try to resolve via member_id or sub from v2 token
+        member_id = payload.get("member_id") or payload.get("sub")
+        if not member_id:
+            raise HTTPException(status_code=401, detail="Use v3 token for v3 routes")
+        # Look up platform_identity by matching member email
+        row = db.execute(text("""
+            SELECT pi.id, pi.email, t.id as tenant_id, t.slug as tenant_slug
+            FROM members m
+            JOIN platform_identities pi ON pi.email = m.email
+            JOIN tenants t ON t.slug = 'rtifn'
+            WHERE m.id = :mid
+            LIMIT 1
+        """), {"mid": member_id}).fetchone()
+        if not row:
+            # Try by email in v2 token
+            email = payload.get("email")
+            if email:
+                row = db.execute(text("""
+                    SELECT pi.id, pi.email, t.id as tenant_id, t.slug as tenant_slug
+                    FROM platform_identities pi
+                    JOIN tenants t ON t.slug = 'rtifn'
+                    WHERE pi.email = :email
+                    LIMIT 1
+                """), {"email": email}).fetchone()
+        if not row:
+            raise HTTPException(status_code=401, detail="Use v3 token for v3 routes")
+        # Build compatible payload
+        compat_payload = {
+            "sub": str(row.id),
+            "tenant_id": str(row.tenant_id),
+            "tenant_slug": row.tenant_slug,
+            "roles": [payload.get("role", "standard_member")],
+            "admin_level": None,
+            "v": "3_compat",
+        }
+        db.execute(text("SET LOCAL app.current_tenant_id = :tid"), {"tid": str(row.tenant_id)})
+        return compat_payload
+
     identity_id = payload.get("sub")
     tenant_id = payload.get("tenant_id")
     if not identity_id or not tenant_id:

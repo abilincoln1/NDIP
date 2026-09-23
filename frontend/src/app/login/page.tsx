@@ -40,6 +40,19 @@ export default function LoginPage() {
     try {
       const r = await authApi.login(email, password);
       localStorage.setItem("agora_token", r.data.access_token);
+      // Also obtain v3 token for operational pages (Activities/Volunteers/Projects)
+      try {
+        const backendUrl = "http://localhost:8000";
+        const r3 = await fetch(`${backendUrl}/api/v3/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password, tenant_slug: "rtifn" }),
+        });
+        if (r3.ok) {
+          const d3 = await r3.json();
+          if (d3.access_token) localStorage.setItem("agora_token_v3", d3.access_token);
+        }
+      } catch (_) {}
       router.push("/");
     } catch (err: any) {
       const detail = err?.response?.data?.detail;
