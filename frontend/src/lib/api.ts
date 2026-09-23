@@ -14,18 +14,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Redirect to login on 401 (invalid/expired token) or 403 (no token at all —
-// FastAPI's HTTPBearer security scheme returns 403, not 401, when the
-// Authorization header is simply missing). Without handling 403 here, a
-// logged-out user sees the dashboard shell render normally while every
-// individual page's data fetch silently fails, with no indication that
-// they need to log in again.
-//
-// Auth endpoints themselves are excluded: a 401/403 from /auth/login (bad
-// credentials, deactivated account) is a message to show inline on the
-// login form, not a session-expiry redirect — and redirecting away from
-// the login page while the user is actively trying to log in would wipe
-// out that error message before they ever saw it.
 api.interceptors.response.use(
   (r) => r,
   (err) => {
@@ -45,11 +33,12 @@ api.interceptors.response.use(
 
 export default api;
 
-// ─── Typed API methods ────────────────────────────────────────────────────────
+// ── Typed API methods ──────────────────────────────────────────────────
 
 export const authApi = {
+  // Fixed: use member login endpoint, not admin /auth/login
   login: (email: string, password: string) =>
-    api.post("/auth/login", { email, password }),
+    api.post("/api/v2/members/login", { email, password }),
   register: (email: string, password: string, full_name: string) =>
     api.post("/auth/register", { email, password, full_name }),
 };
