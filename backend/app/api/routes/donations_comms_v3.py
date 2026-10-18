@@ -135,6 +135,7 @@ class CommunicationCreate(BaseModel):
     project_id: Optional[str] = None
     reference: Optional[str] = None
     notes: Optional[str] = None
+    status: Optional[COMMUNICATION_STATUSES] = None     # defaults to 'draft' if not supplied
 
 
 class CommunicationUpdate(BaseModel):
@@ -339,7 +340,7 @@ def create_communication(
             :id, :tenant_id, :communication_type, :subject,
             :sender_identity_id, :recipient_identity_id, :recipient_external,
             :organisation_id, :project_id, :reference,
-            :communication_date, :notes, 'draft', FALSE,
+            :communication_date, :notes, :status, FALSE,
             NOW(), NOW()
         )
         RETURNING id, status, created_at
@@ -358,6 +359,7 @@ def create_communication(
         "reference": data.reference,
         "communication_date": data.communication_date,
         "notes": data.notes,
+        "status": data.status or "draft",
     }).fetchone()
 
     db.commit()
