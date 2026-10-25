@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+﻿from datetime import datetime, timezone
 from typing import Optional
 from sqlalchemy import (
     String, Integer, Float, Boolean, Text, DateTime, ForeignKey,
@@ -14,7 +14,7 @@ def utcnow():
     return datetime.now(timezone.utc)
 
 
-# ─── Enums ────────────────────────────────────────────────────────────────────
+# â”€â”€â”€ Enums â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class EngagementType(str, enum.Enum):
     registration = "registration"
@@ -46,7 +46,7 @@ class SocialPlatform(str, enum.Enum):
     gdelt = "gdelt"
 
 
-# ─── Admin users (platform operators) ────────────────────────────────────────
+# â”€â”€â”€ Admin users (platform operators) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class AdminUser(Base):
     __tablename__ = "admin_users"
@@ -60,7 +60,7 @@ class AdminUser(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 
 
-# ─── Participants (opt-in, GDPR-aware) ────────────────────────────────────────
+# â”€â”€â”€ Participants (opt-in, GDPR-aware) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class Participant(Base):
     __tablename__ = "participants"
@@ -87,7 +87,7 @@ class Participant(Base):
     )
 
 
-# ─── Events ───────────────────────────────────────────────────────────────────
+# â”€â”€â”€ Events â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class Event(Base):
     __tablename__ = "events"
@@ -127,7 +127,7 @@ class EventAttendance(Base):
     participant: Mapped["Participant"] = relationship(back_populates="attendances")
 
 
-# ─── Engagements (aggregated interaction events) ──────────────────────────────
+# â”€â”€â”€ Engagements (aggregated interaction events) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class Engagement(Base):
     __tablename__ = "engagements"
@@ -146,7 +146,7 @@ class Engagement(Base):
     )
 
 
-# ─── Surveys ──────────────────────────────────────────────────────────────────
+# â”€â”€â”€ Surveys â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class Survey(Base):
     __tablename__ = "surveys"
@@ -160,7 +160,7 @@ class Survey(Base):
     response_count: Mapped[int] = mapped_column(Integer, default=0)
 
 
-# ─── Social posts (aggregated, no individual attribution) ─────────────────────
+# â”€â”€â”€ Social posts (aggregated, no individual attribution) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class SocialPost(Base):
     __tablename__ = "social_posts"
@@ -168,10 +168,10 @@ class SocialPost(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     platform: Mapped[SocialPlatform] = mapped_column(SAEnum(SocialPlatform), nullable=False, index=True)
     external_id: Mapped[str] = mapped_column(String(200), nullable=False)
-    # No author data stored — aggregated content only
+    # No author data stored â€” aggregated content only
     content_text: Mapped[Optional[str]] = mapped_column(Text)
     url: Mapped[Optional[str]] = mapped_column(String(500))
-    language: Mapped[Optional[str]] = mapped_column(String(10))
+    language: Mapped[Optional[str]] = mapped_column(String(50))
     published_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), index=True)
     fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     query_tag: Mapped[Optional[str]] = mapped_column(String(200))
@@ -185,7 +185,7 @@ class SocialPost(Base):
 
 
 class SocialMetric(Base):
-    """Aggregated daily metrics per platform — no individual data."""
+    """Aggregated daily metrics per platform â€” no individual data."""
     __tablename__ = "social_metrics"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -205,7 +205,7 @@ class SocialMetric(Base):
     )
 
 
-# ─── Sentiment records ────────────────────────────────────────────────────────
+# â”€â”€â”€ Sentiment records â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class SentimentRecord(Base):
     __tablename__ = "sentiment_records"
@@ -220,7 +220,7 @@ class SentimentRecord(Base):
     post: Mapped[Optional["SocialPost"]] = relationship(back_populates="sentiment")
 
 
-# ─── Topics ───────────────────────────────────────────────────────────────────
+# â”€â”€â”€ Topics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class Topic(Base):
     __tablename__ = "topics"
@@ -238,7 +238,7 @@ class Topic(Base):
     )
 
 
-# ─── Analytics snapshots ──────────────────────────────────────────────────────
+# â”€â”€â”€ Analytics snapshots â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class AnalyticsSnapshot(Base):
     """Historical storage of all computed metrics."""
@@ -257,7 +257,7 @@ class AnalyticsSnapshot(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
-# ─── Reports ──────────────────────────────────────────────────────────────────
+# â”€â”€â”€ Reports â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class Report(Base):
     __tablename__ = "reports"
@@ -276,7 +276,7 @@ class Report(Base):
     )
 
 
-# ─── Normalised post (unified schema across all sources) ──────────────────────
+# â”€â”€â”€ Normalised post (unified schema across all sources) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class NormalisedPost(Base):
     """
@@ -291,7 +291,7 @@ class NormalisedPost(Base):
     source_post_id: Mapped[Optional[int]] = mapped_column(ForeignKey("social_posts.id"), index=True)
     external_id: Mapped[str] = mapped_column(String(300), nullable=False)
     text: Mapped[Optional[str]] = mapped_column(Text)
-    language: Mapped[Optional[str]] = mapped_column(String(10))
+    language: Mapped[Optional[str]] = mapped_column(String(50))
     geo_country: Mapped[Optional[str]] = mapped_column(String(100))
     geo_region: Mapped[Optional[str]] = mapped_column(String(200))
     url: Mapped[Optional[str]] = mapped_column(String(500))
@@ -314,7 +314,7 @@ class NormalisedPost(Base):
     )
 
 
-# ─── Named entities ───────────────────────────────────────────────────────────
+# â”€â”€â”€ Named entities â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class NamedEntity(Base):
     __tablename__ = "named_entities"
@@ -333,7 +333,7 @@ class NamedEntity(Base):
     )
 
 
-# ─── Narrative trends ─────────────────────────────────────────────────────────
+# â”€â”€â”€ Narrative trends â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class NarrativeTrend(Base):
     __tablename__ = "narrative_trends"
@@ -353,7 +353,7 @@ class NarrativeTrend(Base):
     )
 
 
-# ─── Connector health log ─────────────────────────────────────────────────────
+# â”€â”€â”€ Connector health log â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class ConnectorHealthLog(Base):
     __tablename__ = "connector_health_logs"
@@ -372,7 +372,7 @@ class ConnectorHealthLog(Base):
     )
 
 
-# ─── Ingestion jobs ───────────────────────────────────────────────────────────
+# â”€â”€â”€ Ingestion jobs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class IngestionJob(Base):
     __tablename__ = "ingestion_jobs"
@@ -390,7 +390,7 @@ class IngestionJob(Base):
     triggered_by: Mapped[Optional[str]] = mapped_column(String(100))
 
 
-# ─── Decision Support — Recommendation Tracking (V5.6) ───────────────────────
+# â”€â”€â”€ Decision Support â€” Recommendation Tracking (V5.6) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class RecommendationStatus(str, enum.Enum):
     OPEN = "OPEN"
@@ -445,10 +445,10 @@ class RecommendationRecord(Base):
     )
 
 
-# ─── V6.0 Strategic Outcome Intelligence ───────────────────────────────────────
+# â”€â”€â”€ V6.0 Strategic Outcome Intelligence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # Design principle (per platform owner instruction): NO stakeholder or
 # opportunity taxonomy is hard-coded into business logic. Everything below is
-# a REGISTRY — seeded with an initial baseline list via a seed script, but
+# a REGISTRY â€” seeded with an initial baseline list via a seed script, but
 # readable/writable at runtime with no code changes required to add a new
 # institution, programme category, or opportunity type. All V6.0 classification,
 # scoring, and intelligence functions read from these tables rather than from
@@ -495,7 +495,7 @@ class StakeholderType(str, enum.Enum):
 
 class StakeholderRegistry(Base):
     """
-    V6.0 Phase C/D — the canonical, expandable list of named stakeholders
+    V6.0 Phase C/D â€” the canonical, expandable list of named stakeholders
     (institutions and roles) NDIP tracks. Seeded with a baseline list; new
     rows can be added at any time (via admin/config, not a code change) to
     extend coverage beyond the initial energy/infrastructure/diaspora/Nigeria
@@ -518,7 +518,7 @@ class StakeholderRegistry(Base):
     )
     sector: Mapped[Optional[str]] = mapped_column(String(100))      # e.g. "Energy", "Climate", "Diaspora"
     role_description: Mapped[Optional[str]] = mapped_column(Text)
-    # Aliases/keywords used to match this stakeholder in discourse text —
+    # Aliases/keywords used to match this stakeholder in discourse text â€”
     # itself stored as data, not hard-coded, so it's editable without a
     # deployment. Stored as a JSON list of strings.
     aliases_json: Mapped[Optional[str]] = mapped_column(Text)
@@ -533,10 +533,10 @@ class StakeholderRegistry(Base):
 
 class StakeholderProfile(Base):
     """
-    V6.0 Phase D — computed, time-stamped scoring snapshot for a stakeholder.
+    V6.0 Phase D â€” computed, time-stamped scoring snapshot for a stakeholder.
     A new row is written each time scores are recomputed (rather than
     updating one row in place), so trend/momentum can be derived from
-    history — same pattern as AnalyticsSnapshot elsewhere in this schema.
+    history â€” same pattern as AnalyticsSnapshot elsewhere in this schema.
     """
     __tablename__ = "stakeholder_profiles"
 
@@ -577,7 +577,7 @@ class OpportunityCategory(str, enum.Enum):
     INNOVATION_ENTREPRENEURSHIP = "INNOVATION_ENTREPRENEURSHIP"
     TRADE_INVESTMENT = "TRADE_INVESTMENT"
     INDUSTRIAL_DEVELOPMENT = "INDUSTRIAL_DEVELOPMENT"
-    # V6.1 Phase L additions — distinct from the broader ENERGY/INFRASTRUCTURE
+    # V6.1 Phase L additions â€” distinct from the broader ENERGY/INFRASTRUCTURE
     # buckets above because the spec asks to track these as their own
     # strategic lens (Waste, Energy & Climate Intelligence), not merged in.
     WASTE_MANAGEMENT = "WASTE_MANAGEMENT"
@@ -587,7 +587,7 @@ class OpportunityCategory(str, enum.Enum):
     GREEN_INVESTMENT = "GREEN_INVESTMENT"
 
 
-# V6.1 Phase L — the strategic category cluster this release tracks as a
+# V6.1 Phase L â€” the strategic category cluster this release tracks as a
 # dedicated lens. Defined once here (data, not scattered hard-coded lists)
 # so the reporting service and any future route/UI reads from a single
 # source of truth.
@@ -606,7 +606,7 @@ WASTE_ENERGY_CLIMATE_CATEGORIES = [
 
 class OpportunityRegistry(Base):
     """
-    V6.0 Phase A — the canonical, expandable list of opportunity programme
+    V6.0 Phase A â€” the canonical, expandable list of opportunity programme
     types NDIP watches for (e.g. "Mini-grid programmes", "Diaspora bonds").
     Same registry pattern as StakeholderRegistry: seeded, then editable
     without a code change.
@@ -642,7 +642,7 @@ class OpportunityPipelineStatus(str, enum.Enum):
 
 class OpportunityAssessment(Base):
     """
-    V6.0 Phase A/B/F — a single, concrete opportunity instance detected in
+    V6.0 Phase A/B/F â€” a single, concrete opportunity instance detected in
     discourse, with its full assessment (why it matters, strategic value,
     stakeholders, recommended engagement) and current pipeline lifecycle
     status. This is the flagship V6.0 record type.
@@ -663,7 +663,7 @@ class OpportunityAssessment(Base):
     why_it_matters: Mapped[Optional[str]] = mapped_column(Text)
     strategic_value: Mapped[str] = mapped_column(String(20), default="Medium")  # Low/Medium/High/Critical
 
-    # Stakeholders — stored as JSON list of {stakeholder_id, name, role} so the
+    # Stakeholders â€” stored as JSON list of {stakeholder_id, name, role} so the
     # assessment is self-contained even if a registry entry later changes.
     stakeholders_json: Mapped[Optional[str]] = mapped_column(Text)
     recommended_engagement: Mapped[Optional[str]] = mapped_column(Text)
@@ -691,7 +691,7 @@ class OpportunityAssessment(Base):
 
 class OpportunityPipelineEvent(Base):
     """
-    V6.0 Phase F — append-only lifecycle log for an OpportunityAssessment.
+    V6.0 Phase F â€” append-only lifecycle log for an OpportunityAssessment.
     Every status change, engagement action, or milestone update is recorded
     here, so the pipeline tracker has a full audit trail (who engaged, when,
     what happened, what's next) rather than only the current snapshot.
@@ -716,7 +716,7 @@ class OpportunityPipelineEvent(Base):
 
 class OutcomeChainLink(Base):
     """
-    V6.0 Phase E — extends the existing RecommendationRecord evaluation loop
+    V6.0 Phase E â€” extends the existing RecommendationRecord evaluation loop
     (Recommendation -> Evaluation) with the fuller chain the platform owner
     specified: Recommendation -> Leadership Action -> Stakeholder Engagement
     -> Outcome -> Impact. This is intentionally a SEPARATE, linked table
@@ -725,7 +725,7 @@ class OutcomeChainLink(Base):
     compute_decision_quality_metrics) continues to work completely unchanged
     on RecommendationRecord alone. A RecommendationRecord with no
     OutcomeChainLink rows is simply a recommendation that hasn't had a
-    leadership action logged against it yet — not an error state.
+    leadership action logged against it yet â€” not an error state.
 
     DEPRECATED as of V6.2: superseded by StakeholderEngagement, the single
     canonical engagement/outcome system. This model and its table are
@@ -761,9 +761,9 @@ class OutcomeChainLink(Base):
     )
 
 
-# ─── V6.1 Stakeholder Influence & Opportunity Execution Intelligence ─────────
+# â”€â”€â”€ V6.1 Stakeholder Influence & Opportunity Execution Intelligence â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # Same registry-driven design principle as V6.0: relationships are DATA in a
-# table, seeded with a known baseline, expandable without code changes —
+# table, seeded with a known baseline, expandable without code changes â€”
 # not a hard-coded institutional org chart in business logic.
 
 class RelationshipType(str, enum.Enum):
@@ -798,11 +798,11 @@ class StakeholderInfluenceLevel(str, enum.Enum):
 
 class StakeholderRelationship(Base):
     """
-    V6.1 Phase B — Stakeholder Network Mapping. A directed edge between two
+    V6.1 Phase B â€” Stakeholder Network Mapping. A directed edge between two
     StakeholderRegistry entries (e.g. Rural Electrification Agency REPORTS_TO
     Federal Ministry of Power). Seeded with a known baseline of real
     institutional relationships; expandable via the same registry-management
-    routes/UI as stakeholders and opportunities themselves (Phase K) — no
+    routes/UI as stakeholders and opportunities themselves (Phase K) â€” no
     code change required to add a new relationship.
     """
     __tablename__ = "stakeholder_relationships"
@@ -816,10 +816,10 @@ class StakeholderRelationship(Base):
     description: Mapped[Optional[str]] = mapped_column(Text)
     # V6.2 additions -- per the Stakeholder Relationship Graph spec.
     strength: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
-    confidence: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    confidence: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     # Optional link to the opportunity category this relationship is most
     # relevant for (e.g. REA->Ministry of Power is most relevant to ENERGY
-    # opportunities) — used by the alignment/pathway engines, not required.
+    # opportunities) â€” used by the alignment/pathway engines, not required.
     relevant_category: Mapped[Optional[str]] = mapped_column(String(50))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
@@ -832,9 +832,9 @@ class StakeholderRelationship(Base):
 
 class StakeholderInfluenceProfile(Base):
     """
-    V6.1 Phase A — Stakeholder Influence Analysis. A richer, time-stamped
+    V6.1 Phase A â€” Stakeholder Influence Analysis. A richer, time-stamped
     scoring snapshot than V6.0's StakeholderProfile (which this extends
-    rather than replaces — V6.0's profile remains the source for raw
+    rather than replaces â€” V6.0's profile remains the source for raw
     mention/visibility/engagement numbers; this table adds the V6.1-specific
     composite scores derived from those plus network and narrative data).
     """
@@ -864,9 +864,9 @@ class StakeholderInfluenceProfile(Base):
 
 class StakeholderMomentumSnapshot(Base):
     """
-    V6.1 Phase G — Stakeholder Momentum Tracker. Append-only time series
+    V6.1 Phase G â€” Stakeholder Momentum Tracker. Append-only time series
     (separate from StakeholderInfluenceProfile so momentum direction can be
-    derived from real history — comparing consecutive snapshots — rather
+    derived from real history â€” comparing consecutive snapshots â€” rather
     than estimated from a single period like V6.0's "Stakeholder Influence
     Shifts" proxy, which the V6.0 audit flagged as a known limitation).
     """
@@ -890,7 +890,7 @@ class StakeholderMomentumSnapshot(Base):
 
 class OpportunityAlignmentScore(Base):
     """
-    V6.1 Phase D — Opportunity Alignment Engine. Replaces V6.0's placeholder
+    V6.1 Phase D â€” Opportunity Alignment Engine. Replaces V6.0's placeholder
     opportunity_alignment_score (always 0.0, flagged as a known limitation
     in the V6.0 audit) with a genuine multi-factor score, computed and
     stored per opportunity-stakeholder pair so the full breakdown (not just
@@ -918,7 +918,7 @@ class OpportunityAlignmentScore(Base):
 
 
 class OpportunityReadinessAssessment(Base):
-    """V6.1 Phase E — Opportunity Readiness Index."""
+    """V6.1 Phase E â€” Opportunity Readiness Index."""
     __tablename__ = "opportunity_readiness_assessments"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -943,10 +943,10 @@ class OpportunityReadinessAssessment(Base):
 
 class EngagementPathway(Base):
     """
-    V6.1 Phase F — Engagement Pathway Engine. The generated, ordered
+    V6.1 Phase F â€” Engagement Pathway Engine. The generated, ordered
     engagement plan for a single opportunity. Steps are stored as a related
     table (EngagementStep) rather than JSON so each step can later be
-    individually marked complete/in-progress as real engagement unfolds —
+    individually marked complete/in-progress as real engagement unfolds â€”
     consistent with the V6.0 OpportunityPipelineEvent audit-trail pattern.
     """
     __tablename__ = "engagement_pathways"
@@ -978,9 +978,9 @@ class EngagementStep(Base):
     )
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# V6.2 — Stakeholder Intelligence & Engagement System (SIES)
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# V6.2 â€” Stakeholder Intelligence & Engagement System (SIES)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 class StakeholderEngagementEventType(str, enum.Enum):
     ENGAGEMENT_INITIATED = "ENGAGEMENT_INITIATED"
@@ -1011,7 +1011,7 @@ class StakeholderWatchlistEventType(str, enum.Enum):
 
 class StakeholderEngagement(Base):
     """
-    V6.2 — single canonical engagement/outcome system, per the approved
+    V6.2 â€” single canonical engagement/outcome system, per the approved
     execution-safe migration spec. Replaces OutcomeChainLink (deprecated
     above, not deleted) as the write target for all engagement and
     outcome tracking platform-wide.
@@ -1028,7 +1028,7 @@ class StakeholderEngagement(Base):
     description: Mapped[Optional[str]] = mapped_column(Text)
     recorded_by: Mapped[Optional[str]] = mapped_column(String(150))
     # Idempotency key for legacy-data migration (format: "outcome_chain:{id}").
-    # Unused at deploy time — OutcomeChainLink was confirmed empty (0 rows)
+    # Unused at deploy time â€” OutcomeChainLink was confirmed empty (0 rows)
     # immediately before this table was created. Retained as forward-looking
     # insurance per the approved V6.2 execution-safe spec.
     source_legacy_id: Mapped[Optional[str]] = mapped_column(String(100), index=True)
@@ -1041,7 +1041,7 @@ class StakeholderEngagement(Base):
 
 
 class StakeholderWatchlist(Base):
-    """V6.2 — event-based tracking of stakeholder-relevant developments (appointments, announcements, leadership changes, etc.)."""
+    """V6.2 â€” event-based tracking of stakeholder-relevant developments (appointments, announcements, leadership changes, etc.)."""
     __tablename__ = "stakeholder_watchlist"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     stakeholder_id: Mapped[int] = mapped_column(ForeignKey("stakeholder_registry.id"), nullable=False, index=True)
@@ -1051,3 +1051,72 @@ class StakeholderWatchlist(Base):
     detected_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, index=True)
     description: Mapped[Optional[str]] = mapped_column(Text)
     source: Mapped[Optional[str]] = mapped_column(String(100))
+
+
+# â”€â”€â”€ Phase D.1: Geography Foundation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ng_states -> ng_lgas -> ng_wards -> ng_polling_units
+# Integer PKs are NDIP-internal surrogate keys (not a single external
+# numbering authority's codes â€” see PHASE_D1_IMPLEMENTATION.md).
+# ng_states.code carries the real ISO 3166-2:NG code per state.
+
+class NgState(Base):
+    __tablename__ = "ng_states"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    code: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    lgas: Mapped[list["NgLga"]] = relationship(back_populates="state")
+
+
+class NgLga(Base):
+    __tablename__ = "ng_lgas"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(150), nullable=False)
+    code: Mapped[Optional[str]] = mapped_column(String(20))
+    state_id: Mapped[int] = mapped_column(ForeignKey("ng_states.id"), nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    state: Mapped["NgState"] = relationship(back_populates="lgas")
+    wards: Mapped[list["NgWard"]] = relationship(back_populates="lga")
+
+    __table_args__ = (
+        Index("ix_ng_lgas_name", "name"),
+        Index("ux_ng_lgas_state_name", "state_id", "name", unique=True),
+    )
+
+
+class NgWard(Base):
+    __tablename__ = "ng_wards"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(150), nullable=False)
+    code: Mapped[Optional[str]] = mapped_column(String(20))
+    lga_id: Mapped[int] = mapped_column(ForeignKey("ng_lgas.id"), nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    lga: Mapped["NgLga"] = relationship(back_populates="wards")
+    polling_units: Mapped[list["NgPollingUnit"]] = relationship(back_populates="ward")
+
+    __table_args__ = (
+        Index("ix_ng_wards_name", "name"),
+        Index("ux_ng_wards_lga_name", "lga_id", "name", unique=True),
+    )
+
+
+class NgPollingUnit(Base):
+    __tablename__ = "ng_polling_units"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    code: Mapped[Optional[str]] = mapped_column(String(30))
+    ward_id: Mapped[int] = mapped_column(ForeignKey("ng_wards.id"), nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    ward: Mapped["NgWard"] = relationship(back_populates="polling_units")
+
+    __table_args__ = (
+        Index("ix_ng_polling_units_name", "name"),
+    )
